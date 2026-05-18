@@ -1,0 +1,119 @@
+@page
+@model SPMD.Pages.Pharmacist.IndexModel
+@{
+    ViewData["Title"] = "Pharmacist Dashboard";
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="display-6 text-success">Pharmacist Dashboard</h2>
+            <p class="text-muted">Manage inventory and process patient medications.</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a asp-page="/Dispensing/Queue" class="btn btn-success btn-lg shadow-sm">
+                View Dispensing Queue
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Critical Alerts -->
+        <div class="col-md-6">
+            <div class="card border-danger shadow-sm h-100">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Low Stock Alerts</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.LowStockMedicines.Any())
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var med in Model.LowStockMedicines)
+                            {
+                                <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <div>
+                                        <strong>@med.MedicineName</strong>
+                                        <div class="small text-muted">@med.Brand</div>
+                                    </div>
+                                    <span class="badge bg-danger rounded-pill">Critical</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-center py-3 text-muted">All stock levels are healthy.</p>
+                    }
+                </div>
+                <div class="card-footer bg-white text-center">
+                    <a asp-page="/Inventory/Dashboard" class="btn btn-link btn-sm text-decoration-none">Manage Inventory</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-warning shadow-sm h-100">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Expiring Soon (Next 30 Days)</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.ExpiringBatches.Any())
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var batch in Model.ExpiringBatches)
+                            {
+                                <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <div>
+                                        <strong>@batch.Medicine.MedicineName</strong>
+                                        <div class="small text-muted">Batch: @batch.BatchNumber</div>
+                                    </div>
+                                    <span class="text-danger fw-bold small">@batch.ExpiryDate.ToString("MMM dd, yyyy")</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-center py-3 text-muted">No batches expiring soon.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Dispensing -->
+        <div class="col-md-12 mt-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h4 class="mb-0">Recent Dispensing Events</h4>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Patient</th>
+                                    <th>Medicine</th>
+                                    <th>Batch</th>
+                                    <th>Date/Time</th>
+                                    <th>Pharmacist</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var dr in Model.RecentDispensing)
+                                {
+                                    <tr>
+                                        <td>@dr.Patient.FirstName @dr.Patient.LastName</td>
+                                        <td>@dr.PrescriptionItem.Medicine.MedicineName</td>
+                                        <td><code class="text-dark">@dr.batchNumber</code></td>
+                                        <td>@dr.DispensedAt.ToString("g")</td>
+                                        <td>@dr.Pharmacist.FirstName @dr.Pharmacist.LastName</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

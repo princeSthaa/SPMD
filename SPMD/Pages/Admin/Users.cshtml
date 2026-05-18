@@ -1,0 +1,120 @@
+@page
+@model SPMD.Pages.Admin.UsersModel
+@{
+    ViewData["Title"] = "User Identity Management";
+}
+
+<div class="container mt-4">
+    <div class="row align-items-center mb-5">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold text-primary">System Identity Control</h1>
+            <p class="text-secondary fs-5">Manage clinical personnel accounts and administrative access.</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="badge bg-error-container text-error p-2 px-3 border-error">
+                <span class="material-symbols-outlined fs-6 align-middle me-1">security</span>
+                SUPER ADMIN PRIVILEGE ACTIVE
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-xl overflow-hidden bg-white">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-surface-container-low text-on-surface-variant small uppercase tracking-wider">
+                        <tr>
+                            <th class="ps-4 py-3">Account Details</th>
+                            <th>Clinical Role</th>
+                            <th>Status</th>
+                            <th>Created On</th>
+                            @if (!User.IsInRole("SuperAdmin"))
+                            {
+                                <th class="text-end pe-4">Administrative Actions</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0">
+                        @foreach (var user in Model.Users)
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm me-3">@user.Username[0].ToString().ToUpper()</div>
+                                        <div>
+                                            <div class="fw-bold text-on-surface">@user.Username</div>
+                                            <div class="text-muted small">@user.Email</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge @(user.Role.Name == SPMD.Models.RoleName.SuperAdmin ? "bg-primary" : "bg-secondary-container text-primary") px-3">
+                                        @user.Role.Name
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (user.IsActive)
+                                    {
+                                        <span class="text-success fw-bold d-flex align-items-center">
+                                            <span class="material-symbols-outlined fs-6 me-1">check_circle</span>
+                                            Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-error fw-bold d-flex align-items-center">
+                                            <span class="material-symbols-outlined fs-6 me-1">cancel</span>
+                                            Deactivated
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-muted small">
+                                    @user.CreatedAt.ToString("MMM dd, yyyy")
+                                </td>
+                                @if (!User.IsInRole("SuperAdmin"))
+                                {
+                                    <td class="text-end pe-4">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <form method="post" asp-page-handler="ToggleStatus" asp-route-userId="@user.UserId">
+                                                <button type="submit" class="btn btn-sm @(user.IsActive ? "btn-outline-warning" : "btn-outline-success") rounded-pill px-3">
+                                                    @(user.IsActive ? "Deactivate" : "Activate")
+                                                </button>
+                                            </form>
+                                            
+                                            @if (user.Username != User.Identity?.Name) // Prevent self-deletion
+                                            {
+                                                <form method="post" asp-page-handler="DeleteUser" asp-route-userId="@user.UserId" onsubmit="return confirm('WARNING: This will permanently remove the clinical identity and all profile data for @user.Username. Proceed?')">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                                                        Remove Identity
+                                                    </button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .rounded-xl { border-radius: 1rem !important; }
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        background-color: var(--color-primary-container);
+        color: var(--color-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.8rem;
+    }
+    .bg-error-container { background-color: #fef2f2; color: #991b1b; }
+    .border-error { border: 1px solid #fecaca; }
+</style>

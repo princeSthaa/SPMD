@@ -1,0 +1,99 @@
+@model IEnumerable<SPMD.Models.Patient>
+
+<div class="row row-cols-1 row-cols-lg-2 g-4">
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var patient in Model)
+        {
+            <div class="col animate__animated animate__fadeIn">
+                <div class="card h-100 shadow-sm border-0 patient-card bg-white p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-secondary-container p-3 rounded-circle me-3">
+                                <span class="material-symbols-outlined text-primary fs-3">person</span>
+                            </div>
+                            <div>
+                                <h4 class="mb-1 text-on-surface fw-bold">@patient.FirstName @patient.LastName</h4>
+                                <span class="text-on-surface-variant small font-data-mono uppercase tracking-tighter">REF: #@patient.PatientId | <span class="text-primary fw-bold">@patient.Gender</span></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <div class="d-flex align-items-center text-on-surface-variant small mb-1">
+                                <span class="material-symbols-outlined fs-6 me-1">call</span>
+                                <span class="fw-semibold uppercase">Primary Contact</span>
+                            </div>
+                            <p class="mb-0 text-on-surface">@patient.Phone</p>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center text-on-surface-variant small mb-1">
+                                <span class="material-symbols-outlined fs-6 me-1">mail</span>
+                                <span class="fw-semibold uppercase">Email</span>
+                            </div>
+                            <p class="mb-0 text-on-surface text-truncate">@patient.Email</p>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-surface-container-low rounded-lg border mb-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="material-symbols-outlined text-error fs-5 me-2">warning</span>
+                            <span class="text-on-surface fw-bold small text-uppercase">Critical Safety Notes: Allergies</span>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2">
+                            @if (patient.AllergyRecords.Any())
+                            {
+                                @foreach (var allergy in patient.AllergyRecords)
+                                {
+                                    <span class="badge bg-error-container text-on-error-container border-error">@allergy.Substance</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-secondary small italic">No documented drug allergies.</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pt-3 border-top d-flex gap-2">
+                        <a asp-page="/Prescriptions/Create" asp-route-patientId="@patient.PatientId" class="btn btn-primary btn-sm flex-grow-1 d-flex align-items-center justify-content-center">
+                            <span class="material-symbols-outlined fs-5 me-2">add_notes</span>
+                            Prescribe
+                        </a>
+                        <a asp-page="/Dispensing/Direct" asp-route-patientId="@patient.PatientId" class="btn btn-success btn-sm flex-grow-1 d-flex align-items-center justify-content-center">
+                            <span class="material-symbols-outlined fs-5 me-2">medication</span>
+                            Dispense
+                        </a>
+                        <a asp-page="/Patients/ClinicalNotes" asp-route-id="@patient.PatientId" class="btn btn-outline-primary btn-sm d-flex align-items-center px-3">
+                            <span class="material-symbols-outlined fs-5">clinical_notes</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12 w-100">
+            <div class="card border-0 bg-surface-container-low text-center py-5">
+                <span class="material-symbols-outlined text-secondary display-4 mb-3">person_search</span>
+                <h4 class="text-on-surface mb-2">No patients match your criteria</h4>
+                <p class="text-on-surface-variant mb-0 px-4">Ensure the patient is registered in the system or try searching by Health ID.</p>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .patient-card {
+        border: 1px solid var(--color-outline-variant) !important;
+        border-radius: var(--radius-lg) !important;
+    }
+    .patient-card:hover {
+        border-color: var(--color-primary) !important;
+    }
+    .font-data-mono { font-family: var(--font-family-mono); }
+    .bg-error-container { background-color: #fef2f2; color: #991b1b; }
+    .border-error { border: 1px solid #fecaca; }
+</style>

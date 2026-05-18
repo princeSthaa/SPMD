@@ -1,0 +1,99 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Clinical Command Center";
+}
+
+<div class="container mt-5">
+    <!-- Hero Section -->
+    <div class="row align-items-center mb-5 animate__animated animate__fadeIn">
+        <div class="col-lg-7">
+            <div class="d-inline-flex align-items-center bg-primary-container/10 px-3 py-1 rounded-pill mb-3">
+                <span class="material-symbols-outlined text-primary fs-6 me-2">verified_user</span>
+                <span class="text-primary small fw-bold tracking-wider uppercase">Institutional Trust • Clinical Precision</span>
+            </div>
+            <h1 class="display-3 fw-bold text-primary mb-4">Integrated Medication Management.</h1>
+            <p class="text-secondary fs-4 mb-5 max-w-lg">
+                The next-generation clinical infrastructure for healthcare professionals. Built for safety, speed, and absolute reliability.
+            </p>
+            <div class="d-flex gap-3">
+                @if (User.Identity?.IsAuthenticated != true)
+                {
+                    <a asp-page="/Account/Login" class="btn btn-primary btn-lg px-5 rounded-pill shadow-md">
+                        Access Portal
+                        <span class="material-symbols-outlined ms-2">arrow_forward</span>
+                    </a>
+                    <a asp-page="/Medicines/Search" class="btn btn-outline-primary btn-lg px-5 rounded-pill">
+                        Live Inventory
+                    </a>
+                }
+                else
+                {
+                    <a asp-page="/Index" class="btn btn-primary btn-lg px-5 rounded-pill shadow-md">
+                        Enter Workspace
+                        <span class="material-symbols-outlined ms-2">dashboard</span>
+                    </a>
+                }
+            </div>
+        </div>
+        <div class="col-lg-5 d-none d-lg-block">
+            <div class="position-relative">
+                <div class="bg-primary-container rounded-3xl p-5 shadow-2xl animate__animated animate__pulse animate__infinite animate__slow">
+                    <span class="material-symbols-outlined text-white display-1 opacity-20 position-absolute top-0 end-0 m-4">health_and_safety</span>
+                    <div class="position-relative z-10">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="bg-white/20 p-3 rounded-xl me-3">
+                                <span class="material-symbols-outlined text-white fs-1">shield_with_heart</span>
+                            </div>
+                            <h3 class="text-white mb-0">Safety First</h3>
+                        </div>
+                        <p class="text-blue-100 fs-5 mb-0">
+                            Our Clinical Safety Engine processes millions of data points to ensure every prescription is verified against patient-specific clinical markers.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature Grid -->
+    <div class="row g-4 mb-5 pt-5">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm p-4 bg-white rounded-xl">
+                <div class="bg-surface-container-low w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                    <span class="material-symbols-outlined text-primary fs-2">clinical_notes</span>
+                </div>
+                <h4 class="text-primary fw-bold mb-3">Smart Prescribing</h4>
+                <p class="text-secondary mb-0">Evidence-based workflow with real-time allergy cross-referencing and dose verification.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm p-4 bg-white rounded-xl">
+                <div class="bg-surface-container-low w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                    <span class="material-symbols-outlined text-primary fs-2">fec</span>
+                </div>
+                <h4 class="text-primary fw-bold mb-3">FEFO Inventory</h4>
+                <p class="text-secondary mb-0">Intelligent batch management prioritized by expiration dates to minimize clinical waste and maximize safety.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm p-4 bg-white rounded-xl">
+                <div class="bg-surface-container-low w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                    <span class="material-symbols-outlined text-primary fs-2">fingerprint</span>
+                </div>
+                <h4 class="text-primary fw-bold mb-3">Forensic Audit</h4>
+                <p class="text-secondary mb-0">Comprehensive tracking of every clinical decision for total institutional accountability and legal protection.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .rounded-3xl { border-radius: 2rem !important; }
+    .w-12 { width: 3rem; }
+    .h-12 { height: 3rem; }
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-center { justify-content: center; }
+    .bg-primary-container\/10 { background-color: rgba(30, 58, 138, 0.1); }
+</style>

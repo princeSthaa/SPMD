@@ -1,0 +1,100 @@
+@page
+@model SPMD.Pages.Doctor.IndexModel
+@{
+    ViewData["Title"] = "Doctor Dashboard";
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="display-6 text-primary">Doctor Dashboard</h2>
+            <p class="text-muted">Manage your patients and issue new prescriptions.</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a asp-page="/Patients/Search" class="btn btn-primary btn-lg shadow-sm">
+                <i class="bi bi-plus-circle"></i> New Prescription
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Quick Stats -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body text-center py-4">
+                    <h5 class="text-muted mb-3">Active Patients</h5>
+                    <p class="display-5 fw-bold text-dark">@Model.TotalPatients</p>
+                    <a asp-page="/Patients/Search" class="btn btn-sm btn-outline-primary mt-2">View All</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body text-center py-4">
+                    <h5 class="text-muted mb-3">Prescriptions Issued</h5>
+                    <p class="display-5 fw-bold text-success">@Model.TotalPrescriptions</p>
+                    <span class="text-muted small">Total lifetime</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body text-center py-4">
+                    <h5 class="text-muted mb-3">Recent Validations</h5>
+                    <p class="display-5 fw-bold text-info">@Model.RecentValidations</p>
+                    <span class="text-muted small">Last 30 days</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="col-md-12 mt-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h4 class="mb-0">Recent Prescriptions</h4>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Patient</th>
+                                    <th>Prescription #</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Items</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var p in Model.RecentPrescriptions)
+                                {
+                                    <tr>
+                                        <td>@p.Patient?.FirstName @p.Patient?.LastName</td>
+                                        <td><code class="text-primary">@p.PrescriptionNumber.Substring(0, 8)</code></td>
+                                        <td>@p.IssuedAt.ToString("g")</td>
+                                        <td>
+                                            @if (p.Status == SPMD.Models.PrescriptionStatus.Issued)
+                                            {
+                                                <span class="badge bg-success">Issued</span>
+                                            }
+                                            else if (p.Status == SPMD.Models.PrescriptionStatus.Dispensed)
+                                            {
+                                                <span class="badge bg-info text-dark">Dispensed</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark border">@p.Items.Count items</span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-white text-center py-3">
+                    <a asp-page="/Prescriptions/History" class="btn btn-link text-decoration-none">View All Prescription History</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

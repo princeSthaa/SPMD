@@ -1,0 +1,137 @@
+@page "{id:int}"
+@model SPMD.Pages.Patients.ClinicalNotesModel
+@{
+    ViewData["Title"] = "Patient Clinical History";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-start mb-5">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-page="/Patients/Search">Clinical Lookup</a></li>
+                    <li class="breadcrumb-item active">Patient History</li>
+                </ol>
+            </nav>
+            <h2 class="display-5 fw-bold text-primary">Clinical Summary: @Model.Patient?.FirstName @Model.Patient?.LastName</h2>
+            <p class="text-secondary fs-5">Comprehensive medical timeline and therapeutic records.</p>
+        </div>
+        <a asp-page="/Prescriptions/Create" asp-route-patientId="@Model.Patient?.PatientId" class="btn btn-primary btn-lg rounded-pill px-4 shadow-sm">
+            <span class="material-symbols-outlined align-middle me-2">prescriptions</span>
+            New Prescription
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Patient Sidebar Info -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-xl bg-white mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-uppercase small tracking-widest text-muted mb-4 border-bottom pb-2">Clinical Profile</h5>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="small text-muted d-block">Full Identity</label>
+                            <span class="fw-bold">@Model.Patient?.FirstName @Model.Patient?.LastName</span>
+                        </div>
+                        <div>
+                            <label class="small text-muted d-block">Gender</label>
+                            <span class="badge bg-primary-container text-white">@Model.Patient?.Gender</span>
+                        </div>
+                        <div>
+                            <label class="small text-muted d-block">Contact Info</label>
+                            <span class="text-on-surface">@Model.Patient?.Phone</span><br />
+                            <span class="text-on-surface small">@Model.Patient?.Email</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-xl bg-error-container text-on-error-container">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-uppercase small tracking-widest mb-3 border-bottom border-error pb-2">Critical Allergies</h5>
+                    @if (Model.Patient?.AllergyRecords.Any() == true)
+                    {
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var allergy in Model.Patient.AllergyRecords)
+                            {
+                                <li class="d-flex align-items-center mb-2">
+                                    <span class="material-symbols-outlined fs-5 me-2">warning</span>
+                                    <span class="fw-bold">@allergy.Substance</span>
+                                    <span class="ms-auto small opacity-75">@allergy.Severity</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="mb-0 italic small">No documented clinical allergies.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline / History -->
+        <div class="col-lg-8">
+            <h5 class="fw-bold text-uppercase small tracking-widest text-muted mb-4">Therapeutic Timeline</h5>
+            
+            <div class="timeline">
+                @if (Model.PrescriptionHistory.Any())
+                {
+                    @foreach (var p in Model.PrescriptionHistory)
+                    {
+                        <div class="timeline-item pb-5 position-relative ps-4 border-start border-2 border-primary-container/20">
+                            <div class="timeline-dot position-absolute start-0 top-0 translate-middle bg-primary rounded-circle" style="width: 12px; height: 12px; margin-left: -1px;"></div>
+                            <div class="card border-0 shadow-sm rounded-xl bg-white">
+                                <div class="card-body p-4">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <h5 class="fw-bold mb-1">Prescription Issued</h5>
+                                            <div class="text-muted small">@p.IssuedAt.ToString("MMMM dd, yyyy") at @p.IssuedAt.ToString("t")</div>
+                                        </div>
+                                        <span class="badge @(p.Status == SPMD.Models.PrescriptionStatus.Dispensed ? "bg-info" : "bg-success") px-3">@p.Status</span>
+                                    </div>
+                                    
+                                    <div class="bg-surface-container-low rounded p-3 mb-3">
+                                        <label class="small text-muted text-uppercase fw-bold d-block mb-2">Medications</label>
+                                        @foreach (var item in p.Items)
+                                        {
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <span class="fw-bold text-primary">@item.Medicine?.MedicineName</span>
+                                                <span class="small font-data-mono">Qty: @item.Quantity | @item.Dosage</span>
+                                            </div>
+                                        }
+                                    </div>
+                                    
+                                    @if (!string.IsNullOrEmpty(p.Notes))
+                                    {
+                                        <div class="mt-3 pt-3 border-top border-light">
+                                            <label class="small text-muted text-uppercase fw-bold d-block mb-1">Clinical Notes</label>
+                                            <p class="mb-0 small italic">@p.Notes</p>
+                                        </div>
+                                    }
+                                    <div class="mt-3 small text-muted">Issued by: <span class="fw-bold">Dr. @p.Doctor?.FirstName @p.Doctor?.LastName</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="card border-0 bg-surface-container-low text-center py-5 rounded-xl">
+                        <span class="material-symbols-outlined display-1 text-secondary opacity-25">medical_information</span>
+                        <h4 class="text-on-surface mt-3">No Prescription History</h4>
+                        <p class="text-on-surface-variant">There are no historical prescriptions recorded for this patient.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .rounded-xl { border-radius: 1rem !important; }
+    .bg-error-container { background-color: #fef2f2; color: #991b1b; }
+    .border-error { border-bottom-color: #fecaca !important; }
+    .timeline-item:last-child { border-left-color: transparent !important; }
+    .bg-primary-container { background-color: #1e3a8a; }
+</style>

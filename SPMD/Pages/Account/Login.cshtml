@@ -1,0 +1,221 @@
+@page
+@model SPMD.Pages.Account.LoginModel
+@{
+  ViewData["Title"] = "Clinical Login";
+  Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@ViewData["Title"] - SPMD</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap"
+  rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+  <script>
+    tailwind.config = {
+    theme: {
+    extend: {
+    colors: {
+    "primary": "#00236f",
+    "primary-container": "#1e3a8a",
+    "on-primary": "#ffffff",
+    "surface": "#faf8ff",
+    "on-surface": "#1a1b21",
+    "on-surface-variant": "#444651",
+    "outline": "#757682",
+    "outline-variant": "#c5c5d3",
+    "secondary": "#505f76",
+    "secondary-container": "#d0e1fb",
+    "surface-container-low": "#f4f3fa",
+    "surface-container-lowest": "#ffffff"
+    }
+    }
+    }
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    body {
+    font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+
+<body class="bg-surface text-on-surface min-h-screen flex antialiased">
+  <!-- Left Panel: Visual Hero -->
+  <div class="hidden lg:flex lg:w-1/2 relative bg-primary-container overflow-hidden">
+    <img src="https://images.unsplash.com/photo-1585435557343-3b092031a831?auto=format&fit=crop&q=80&w=2070"
+         alt="Healthcare Background" class="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-overlay" />
+    <div
+      class="relative z-10 flex flex-col justify-end p-12 w-full bg-gradient-to-t from-primary/90 to-transparent h-full">
+      <div class="mb-8">
+        <span class="material-symbols-outlined text-on-primary text-[48px]" style="font-variation-settings: 'FILL' 1;">
+          lock_open
+        </span>
+      </div>
+      <h1 class="text-5xl font-bold text-on-primary mb-4">Precision Access.</h1>
+      <p class="text-xl text-blue-100 max-w-md">
+        Secure clinical portal for authorized healthcare providers and patient services.
+      </p>
+    </div>
+  </div>
+
+  <!-- Right Panel: Login Form -->
+  <div class="w-full lg:w-1/2 flex flex-col justify-center px-6 py-12 lg:px-24 bg-surface relative">
+    <div class="w-full max-w-md mx-auto">
+      <!-- Brand Header -->
+      <div class="flex items-center gap-2 mb-10">
+        <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+          <span class="material-symbols-outlined text-on-primary text-[20px]">vaccines</span>
+        </div>
+        <span class="text-xl text-primary font-bold tracking-tight">SPMD</span>
+      </div>
+
+      <!-- Form Headers -->
+      <div class="mb-8">
+        <h2 class="text-3xl font-bold text-on-surface mb-2">Professional Login</h2>
+        <p class="text-on-surface-variant">Sign in to your clinical workspace.</p>
+      </div>
+
+      <form method="post" class="space-y-6">
+        <div asp-validation-summary="ModelOnly" class="text-red-600 text-sm"></div>
+        
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+            <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-4">
+                <p class="text-green-700 text-sm">@Model.SuccessMessage</p>
+            </div>
+        }
+
+        <!-- Role Selection (Visual Context) -->
+        <div class="pt-2">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-on-surface mb-2">Select Your
+            Workspace</label>
+            <div class="grid grid-cols-3 gap-3" id="roleSelector">
+              <label class="cursor-pointer">
+                <input type="radio" asp-for="Input.RoleId" value="2" class="peer sr-only" checked />
+                <div
+                  class="flex flex-col items-center justify-center py-3 px-2 border border-outline-variant rounded-lg bg-surface-container-lowest peer-checked:border-primary peer-checked:bg-secondary-container/20 peer-checked:ring-1 peer-checked:ring-primary transition-all text-center">
+                  <span class="material-symbols-outlined text-secondary mb-1 peer-checked:text-primary">stethoscope</span>
+                  <span class="text-xs font-medium text-on-surface-variant peer-checked:text-primary">Doctor</span>
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" asp-for="Input.RoleId" value="1" class="peer sr-only" />
+                <div
+                  class="flex flex-col items-center justify-center py-3 px-2 border border-outline-variant rounded-lg bg-surface-container-lowest peer-checked:border-primary peer-checked:bg-secondary-container/20 peer-checked:ring-1 peer-checked:ring-primary transition-all text-center">
+                  <span
+                  class="material-symbols-outlined text-secondary mb-1 peer-checked:text-primary">prescriptions</span>
+                  <span class="text-xs font-medium text-on-surface-variant peer-checked:text-primary">Pharma</span>
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" asp-for="Input.RoleId" value="4" class="peer sr-only" />
+                <div
+                  class="flex flex-col items-center justify-center py-3 px-2 border border-outline-variant rounded-lg bg-surface-container-lowest peer-checked:border-primary peer-checked:bg-secondary-container/20 peer-checked:ring-1 peer-checked:ring-primary transition-all text-center">
+                  <span class="material-symbols-outlined text-secondary mb-1 peer-checked:text-primary">person</span>
+                  <span class="text-xs font-medium text-on-surface-variant peer-checked:text-primary">Patient</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Username -->
+          <div>
+            <label asp-for="Input.Username"
+                   class="block text-xs font-semibold uppercase tracking-wider text-on-surface mb-1">Account ID /
+              Username</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span class="material-symbols-outlined text-outline text-sm">person</span>
+                </div>
+                <input asp-for="Input.Username" id="usernameInput"
+                       class="w-full pl-10 pr-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all shadow-sm"
+                       placeholder="Enter clinician ID (e.g., dr_smith)" />
+              </div>
+              <span asp-validation-for="Input.Username" class="text-red-600 text-xs mt-1"></span>
+            </div>
+
+            <!-- Password -->
+            <div>
+              <div class="flex justify-between items-baseline mb-1">
+                <label asp-for="Input.Password"
+                       class="block text-xs font-semibold uppercase tracking-wider text-on-surface">Password</label>
+                <a asp-page="/Account/ForgotPassword"
+                   class="text-[11px] font-semibold text-primary hover:underline uppercase tracking-wider">Forgot?</a>
+
+              </div>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span class="material-symbols-outlined text-outline text-sm">lock</span>
+                </div>
+                <input asp-for="Input.Password" type="password"
+                       class="w-full pl-10 pr-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all shadow-sm"
+                       placeholder="••••••••" />
+              </div>
+              <span asp-validation-for="Input.Password" class="text-red-600 text-xs mt-1"></span>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit"
+                    class="w-full flex justify-center items-center gap-2 bg-primary text-on-primary py-3 px-4 rounded-lg text-sm font-semibold hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors shadow-sm mt-8">
+              Authorize Access
+              <span class="material-symbols-outlined text-[18px]">key</span>
+            </button>
+          </form>
+
+          <!-- Footer Links -->
+          <div class="mt-8 text-center">
+            <p class="text-sm text-on-surface-variant">
+              New to the system?
+              <a asp-page="./Register" class="font-semibold text-primary hover:underline">Create a clinical account</a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        const roleRadios = document.querySelectorAll('input[name="Input.RoleId"]');
+        const usernameInput = document.getElementById('usernameInput');
+        const roleSelector = document.getElementById('roleSelector');
+        const roleLabel = roleSelector.previousElementSibling;
+
+        const placeholders = {
+        '2': 'Enter clinician ID (e.g., dr_smith)',
+        '1': 'Enter pharmacy ID (e.g., ph_jones)',
+        '4': 'Enter Health ID or username (e.g., jdoe)'
+        };
+
+        roleRadios.forEach(radio => {
+        radio.addEventListener('change', function () {
+        if (this.checked) {
+        usernameInput.placeholder = placeholders[this.value];
+        }
+        });
+        });
+
+        usernameInput.addEventListener('input', function() {
+          if (this.value.toLowerCase() === 'admin') {
+            roleSelector.classList.add('hidden');
+            roleLabel.classList.add('hidden');
+          } else {
+            roleSelector.classList.remove('hidden');
+            roleLabel.classList.remove('hidden');
+          }
+        });
+        });
+      </script>
+    </body>
+
+  </html>

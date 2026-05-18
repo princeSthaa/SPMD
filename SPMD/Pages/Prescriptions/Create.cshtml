@@ -1,0 +1,286 @@
+@page
+@model SPMD.Pages.Prescriptions.CreateModel
+@{
+    ViewData["Title"] = "New Clinical Prescription";
+}
+
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm border-0 rounded-xl overflow-hidden bg-white">
+                <div class="card-header bg-primary py-4 px-5">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-white/10 p-2 rounded-lg me-3">
+                            <span class="material-symbols-outlined text-white fs-3">prescriptions</span>
+                        </div>
+                        <div>
+                            <h2 class="h3 mb-0 text-white fw-bold">Clinical Prescription</h2>
+                            <p class="mb-0 text-blue-100 small opacity-75 uppercase tracking-wider fw-semibold">Precision Medication Management System</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-5">
+                    <form method="post" id="prescriptionForm">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 rounded-lg shadow-sm mb-4"></div>
+
+                        <!-- Section 1: Clinical Subject -->
+                        <div class="clinical-section mb-5">
+                            <div class="d-flex align-items-center mb-4 pb-2 border-bottom border-light">
+                                <span class="material-symbols-outlined text-secondary me-2 fs-5">patient_list</span>
+                                <h5 class="text-on-surface fw-bold mb-0 text-uppercase small tracking-widest">1. Patient Profile</h5>
+                            </div>
+                            
+                            <div class="p-4 bg-surface-container-low rounded-xl border border-outline-variant shadow-inner-sm">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle me-3">@Model.SelectedPatient?.FirstName?[0]@Model.SelectedPatient?.LastName?[0]</div>
+                                            <div>
+                                                <h4 class="text-primary fw-bold mb-0">@Model.SelectedPatient?.FirstName @Model.SelectedPatient?.LastName</h4>
+                                                <span class="text-on-surface-variant small font-data-mono">HEALTH_ID: #@Model.SelectedPatient?.PatientId</span>
+                                                <input type="hidden" asp-for="Prescription.PatientId" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                                        <a asp-page="/Patients/Search" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                                            <span class="material-symbols-outlined fs-6 me-1">sync_alt</span>
+                                            Change Patient
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                @if (Model.SelectedPatient != null && Model.SelectedPatient.AllergyRecords.Any())
+                                {
+                                    <div class="mt-4 pt-3 border-top border-outline-variant/30">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <span class="material-symbols-outlined text-error fs-6 me-2">warning</span>
+                                            <strong class="text-error small fw-bold text-uppercase">Critical Sensitivity Alerts:</strong>
+                                        </div>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            @foreach (var allergy in Model.SelectedPatient.AllergyRecords)
+                                            {
+                                                <span class="badge bg-error-container text-on-error-container border-error small">
+                                                    @allergy.Substance (@allergy.Severity.ToString().ToUpper())
+                                                </span>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Section 2: Medication Regimen -->
+                        <div class="clinical-section mb-5">
+                            <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-light">
+                                <div class="d-flex align-items-center">
+                                    <span class="material-symbols-outlined text-secondary me-2 fs-5">medication</span>
+                                    <h5 class="text-on-surface fw-bold mb-0 text-uppercase small tracking-widest">2. Therapeutic Regimen</h5>
+                                </div>
+                                <button type="button" class="btn btn-primary btn-sm rounded-pill px-4 shadow-sm" id="btnAddMedication">
+                                    <span class="material-symbols-outlined fs-6 me-2">add</span>
+                                    Add Compound
+                                </button>
+                            </div>
+                            
+                            <div id="medicationItems" class="space-y-4">
+                                @for (int i = 0; i < Model.Items.Count; i++)
+                                {
+                                    <div class="med-item card border-outline-variant bg-surface-container-lowest p-4 position-relative shadow-sm mb-3">
+                                        @if (i > 0)
+                                        {
+                                            <button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-med" aria-label="Remove"></button>
+                                        }
+                                        <div class="row g-4">
+                                            <div class="col-md-5">
+                                                <label class="form-label text-on-surface-variant fw-bold small text-uppercase mb-2">Medicine / Compound</label>
+                                                <select name="Items[@i].MedicineId" class="form-select border-outline-variant focus-primary">
+                                                    <option value="">-- Select Active Medicine --</option>
+                                                    @foreach (var med in Model.MedicineList ?? Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>())
+                                                    {
+                                                        <option value="@med.Value" selected="@(med.Value == Model.Items[i].MedicineId.ToString() ? "selected" : null)">@med.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label class="form-label text-on-surface-variant fw-bold small text-uppercase mb-2">Quantity</label>
+                                                <input name="Items[@i].Quantity" value="@Model.Items[i].Quantity" class="form-control border-outline-variant text-center font-data-mono" type="number" step="1" min="1" />
+                                            </div>
+                                            <div class="col-md-5">
+                                                <label class="form-label text-on-surface-variant fw-bold small text-uppercase mb-2">Instructions / Dosage Profile</label>
+                                                <input name="Items[@i].Dosage" value="@Model.Items[i].Dosage" class="form-control border-outline-variant" placeholder="e.g., 500mg BID post-prandial" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Section 3: Professional Notes -->
+                        <div class="clinical-section mb-5">
+                            <div class="d-flex align-items-center mb-4 pb-2 border-bottom border-light">
+                                <span class="material-symbols-outlined text-secondary me-2 fs-5">edit_note</span>
+                                <h5 class="text-on-surface fw-bold mb-0 text-uppercase small tracking-widest">3. Professional Observations</h5>
+                            </div>
+                            <textarea asp-for="Prescription.Notes" class="form-control border-outline-variant" rows="4" placeholder="Enter diagnostic context, therapy goals, or special administration instructions..."></textarea>
+                        </div>
+
+                        <!-- Safety Validation Feedback -->
+                        @if (Model.ValidationResult != null)
+                        {
+                            <div class="animate__animated animate__fadeInUp">
+                                @if (!Model.ValidationResult.IsValid)
+                                {
+                                    <div class="alert bg-error-container text-on-error-container border-error shadow-sm mb-4 p-4 rounded-xl">
+                                        <div class="d-flex align-items-start">
+                                            <span class="material-symbols-outlined text-error fs-3 me-3">block</span>
+                                            <div>
+                                                <h5 class="fw-bold mb-2">CRITICAL SAFETY BLOCK</h5>
+                                                <p class="small opacity-90 mb-3">The system has identified high-risk clinical interactions that must be resolved:</p>
+                                                <ul class="mb-0 fw-semibold">
+                                                    @foreach (var error in Model.ValidationResult.Errors)
+                                                    {
+                                                        <li>@error</li>
+                                                    }
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (Model.ValidationResult.Warnings.Any())
+                                {
+                                    <div class="alert bg-warning-container text-on-warning-container border-warning shadow-sm mb-4 p-4 rounded-xl">
+                                        <div class="d-flex align-items-start">
+                                            <span class="material-symbols-outlined text-warning-dark fs-3 me-3">warning_amber</span>
+                                            <div class="flex-grow-1">
+                                                <h5 class="fw-bold mb-2">CLINICAL SAFETY WARNING</h5>
+                                                <p class="small opacity-90 mb-3">Therapeutic risks detected. Electronic signature and clinical justification required to proceed.</p>
+                                                <ul class="mb-3 fw-medium">
+                                                    @foreach (var warning in Model.ValidationResult.Warnings)
+                                                    {
+                                                        <li>@warning</li>
+                                                    }
+                                                </ul>
+                                                <div class="mt-4 p-3 bg-white/50 rounded-lg">
+                                                    <label class="form-label fw-bold small text-uppercase tracking-wider">Professional Justification for Override</label>
+                                                    <textarea name="overrideReason" class="form-control border-warning bg-white" rows="2" placeholder="Provide evidence-based rationale for this clinical decision..."></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        <!-- Action Controls -->
+                        <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top border-outline-variant/30">
+                            <a asp-page="/Doctor/Index" class="btn btn-outline-secondary px-5 rounded-pill">
+                                Discard Draft
+                            </a>
+                            <div class="d-flex gap-3">
+                                <button type="submit" asp-page-handler="Validate" class="btn btn-outline-primary px-5 rounded-pill fw-bold">
+                                    <span class="material-symbols-outlined fs-5 me-2">verified</span>
+                                    Run Safety Check
+                                </button>
+                                <button type="submit" asp-page-handler="Issue" class="btn btn-primary px-5 rounded-pill fw-bold shadow-md" disabled="@(Model.ValidationResult?.IsValid == true ? null : "disabled")">
+                                    Authorize & Issue
+                                    <span class="material-symbols-outlined fs-5 ms-2">send</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dynamic Row Template -->
+<template id="medRowTemplate">
+    <div class="med-item card border-outline-variant bg-surface-container-lowest p-4 position-relative shadow-sm mb-3">
+        <button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-med" aria-label="Remove"></button>
+        <div class="row g-4">
+            <div class="col-md-5">
+                <label class="form-label text-on-surface-variant fw-bold small text-uppercase mb-2">Medicine / Compound</label>
+                <select name="Items[INDEX].MedicineId" class="form-select border-outline-variant focus-primary">
+                    <option value="">-- Select Active Medicine --</option>
+                    @foreach (var med in Model.MedicineList ?? Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>())
+                    {
+                        <option value="@med.Value">@med.Text</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label text-on-surface-variant fw-bold small text-uppercase mb-2">Quantity</label>
+                <input name="Items[INDEX].Quantity" class="form-control border-outline-variant text-center font-data-mono" type="number" step="1" min="1" value="1" />
+            </div>
+            <div class="col-md-5">
+                <label class="form-label text-on-surface-variant fw-bold small text-uppercase mb-2">Instructions / Dosage Profile</label>
+                <input name="Items[INDEX].Dosage" class="form-control border-outline-variant" placeholder="e.g., 500mg BID post-prandial" />
+            </div>
+        </div>
+    </div>
+</template>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('medicationItems');
+            const addButton = document.getElementById('btnAddMedication');
+            const template = document.getElementById('medRowTemplate').innerHTML;
+
+            function updateIndices() {
+                const items = container.querySelectorAll('.med-item');
+                items.forEach((item, index) => {
+                    item.querySelectorAll('[name*="Items["]').forEach(input => {
+                        input.name = input.name.replace(/Items\[\d+\]/, `Items[${index}]`);
+                    });
+                    
+                    const removeBtn = item.querySelector('.remove-med');
+                    if (removeBtn) {
+                        removeBtn.onclick = function() {
+                            item.remove();
+                            updateIndices();
+                        };
+                    }
+                });
+            }
+
+            addButton.onclick = function() {
+                const index = container.querySelectorAll('.med-item').length;
+                const newRow = template.replace(/INDEX/g, index);
+                container.insertAdjacentHTML('beforeend', newRow);
+                updateIndices();
+            };
+
+            updateIndices();
+        });
+    </script>
+}
+
+<style>
+    .rounded-xl { border-radius: 1.25rem !important; }
+    .bg-error-container { background-color: #fef2f2; color: #991b1b; }
+    .border-error { border: 1px solid #fecaca; }
+    .bg-warning-container { background-color: #fffbeb; color: #92400e; }
+    .border-warning { border: 1px solid #fde68a; }
+    .text-warning-dark { color: #854d0e; }
+    .font-data-mono { font-family: var(--font-family-mono); }
+    .avatar-circle {
+        width: 48px;
+        height: 48px;
+        background-color: var(--color-primary);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+    .shadow-inner-sm { box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05); }
+    .shadow-md { box-shadow: 0 4px 12px rgba(0, 35, 111, 0.15); }
+    .focus-primary:focus { border-color: var(--color-primary) !important; box-shadow: 0 0 0 2px rgba(0, 35, 111, 0.1) !important; }
+</style>

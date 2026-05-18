@@ -1,0 +1,194 @@
+:root {
+  /* Colors */
+  --color-surface: #f7f9fb;
+  --color-surface-dim: #d8dadc;
+  --color-surface-bright: #f7f9fb;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f2f4f6;
+  --color-surface-container: #eceef0;
+  --color-surface-container-high: #e6e8ea;
+  --color-surface-container-highest: #e0e3e5;
+  --color-on-surface: #191c1e;
+  --color-on-surface-variant: #444651;
+  --color-inverse-surface: #2d3133;
+  --color-inverse-on-surface: #eff1f3;
+  --color-outline: #757682;
+  --color-outline-variant: #c5c5d3;
+  --color-surface-tint: #4059aa;
+  --color-primary: #00236f;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #1e3a8a;
+  --color-on-primary-container: #90a8ff;
+  --color-inverse-primary: #b6c4ff;
+  --color-secondary: #505f76;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #d0e1fb;
+  --color-on-secondary-container: #54647a;
+  --color-tertiary: #222a3e;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #384055;
+  --color-on-tertiary-container: #a4acc5;
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+  --color-background: #f7f9fb;
+  --color-on-background: #191c1e;
+
+  /* Typography */
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-family-mono: 'JetBrains Mono', monospace;
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-default: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Spacing */
+  --spacing-base: 4px;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 40px;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+  line-height: 1.6;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-wrapper {
+  flex: 1 0 auto;
+}
+
+footer {
+  flex-shrink: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-primary);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.card {
+  background-color: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-default);
+  box-shadow: 0px 4px 12px rgba(30, 58, 138, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0px 8px 24px rgba(30, 58, 138, 0.1);
+}
+
+.btn-primary {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  color: var(--color-on-primary) !important;
+  border-radius: var(--radius-default) !important;
+  padding: 0.6rem 1.5rem !important;
+  font-weight: 600 !important;
+  transition: all 0.2s !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-container) !important;
+  transform: translateY(-1px);
+}
+
+.btn-outline-primary {
+  border-color: var(--color-outline-variant) !important;
+  color: var(--color-primary) !important;
+  border-radius: var(--radius-default) !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--color-secondary-container) !important;
+  border-color: var(--color-primary) !important;
+  color: var(--color-primary) !important;
+}
+
+.form-control, .form-select {
+  border-radius: var(--radius-default);
+  border: 1px solid var(--color-outline-variant);
+  padding: 0.6rem 1rem;
+  background-color: var(--color-surface-container-lowest);
+  transition: all 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(0, 35, 111, 0.1);
+  outline: none;
+}
+
+.badge {
+  padding: 0.5em 0.8em;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+}
+
+.navbar {
+  background-color: var(--color-surface-container-lowest) !important;
+  border-bottom: 1px solid var(--color-outline-variant);
+  padding: 1rem 0;
+}
+
+.navbar-brand {
+  font-weight: 800;
+  color: var(--color-primary) !important;
+  letter-spacing: -0.05em;
+}
+
+.nav-link {
+  color: var(--color-secondary) !important;
+  font-weight: 500;
+  padding: 0.5rem 1rem !important;
+}
+
+.nav-link:hover {
+  color: var(--color-primary) !important;
+}
+
+/* Specific component styles */
+.medicine-card {
+  border-left: 4px solid var(--color-primary);
+}
+
+.status-in-stock {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.status-limited {
+  background-color: #fef9c3;
+  color: #854d0e;
+}
+
+.status-out-of-stock {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.clinical-note-box {
+  background-color: var(--color-surface-container-low);
+  border: 1px dashed var(--color-outline);
+  padding: 1rem;
+  border-radius: var(--radius-default);
+}

@@ -1,0 +1,136 @@
+@page
+@model SPMD.Pages.Patients.SearchModel
+@{
+    ViewData["Title"] = "Clinical Lookup";
+}
+
+<div class="container mt-4">
+    <div class="row align-items-center mb-5 animate__animated animate__fadeIn">
+        <div class="col-md-7">
+            <div class="d-flex align-items-center mb-2">
+                <div class="bg-primary-container p-2 rounded-lg me-3">
+                    <span class="material-symbols-outlined text-white">person_search</span>
+                </div>
+                <h1 class="display-5 fw-bold text-primary mb-0">Patient Clinical Lookup</h1>
+            </div>
+            <p class="text-secondary fs-5 mb-0">Secure access to electronic health records and allergy profiles.</p>
+        </div>
+        <div class="col-md-5 text-md-end">
+            <button type="button" class="btn btn-outline-primary btn-lg rounded-pill px-4 shadow-sm d-inline-flex align-items-center" data-bs-toggle="modal" data-bs-target="#registerPatientModal">
+                <span class="material-symbols-outlined me-2">person_add</span>
+                Register New Patient
+            </button>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-lg mb-4 shadow-sm" role="alert">
+            <span class="material-symbols-outlined me-2 align-middle">check_circle</span>
+            @Model.Message
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div asp-validation-summary="All" class="text-danger mb-4"></div>
+
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-10">
+            <div class="search-container card border-0 shadow-lg p-2 rounded-pill bg-white">
+                <div class="input-group input-group-lg border-0">
+                    <span class="input-group-text bg-transparent border-0 ps-4">
+                        <span class="material-symbols-outlined text-primary fs-3">search</span>
+                    </span>
+                    <input type="text" id="patientSearchInput" value="@Model.SearchTerm" class="form-control border-0 bg-transparent fs-5 ps-2" placeholder="Search by name, email, phone, or Health ID..." />
+                    <div id="patientSearchSpinner" class="spinner-border spinner-border-sm text-primary position-absolute end-0 top-50 translate-middle-y me-4 d-none" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-3 text-on-surface-variant small d-flex justify-content-center align-items-center gap-3">
+                <span class="d-flex align-items-center"><span class="material-symbols-outlined fs-6 me-1">verified_user</span> HIPAA Compliant</span>
+                <span class="d-flex align-items-center"><span class="material-symbols-outlined fs-6 me-1">bolt</span> Real-time Results</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="patientSearchResults" class="animate__animated animate__fadeIn">
+        <partial name="_PatientSearchResults" model="Model.Patients" />
+    </div>
+</div>
+
+<!-- Register Patient Modal -->
+<div class="modal fade" id="registerPatientModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-xl">
+            <div class="modal-header bg-surface-container-low border-0 p-4">
+                <h5 class="modal-title fw-bold text-primary">Rapid Patient Registration</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" asp-page-handler="RegisterPatient">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Full Name / Username</label>
+                        <input asp-for="NewPatient.Username" class="form-control rounded-lg border-outline-variant" placeholder="e.g. John Doe" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Email Address</label>
+                        <input asp-for="NewPatient.Email" type="email" class="form-control rounded-lg border-outline-variant" placeholder="john@example.com" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Temporary Password</label>
+                        <input asp-for="NewPatient.Password" type="password" class="form-control rounded-lg border-outline-variant" value="Patient123!" required />
+                        <div class="form-text small">Default: Patient123! (User will be prompted to change on first login)</div>
+                    </div>
+                    <p class="small text-muted mb-0">Note: This creates a clinical patient profile and a secure access account.</p>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Register Patient</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('patientSearchInput');
+            const resultsContainer = document.getElementById('patientSearchResults');
+            const spinner = document.getElementById('patientSearchSpinner');
+            let timeout = null;
+
+            searchInput.addEventListener('input', function() {
+                clearTimeout(timeout);
+                spinner.classList.remove('d-none');
+                
+                timeout = setTimeout(async () => {
+                    const searchTerm = searchInput.value;
+                    try {
+                        const response = await fetch(`?handler=SearchPartial&searchTerm=${encodeURIComponent(searchTerm)}`);
+                        if (response.ok) {
+                            const html = await response.text();
+                            resultsContainer.innerHTML = html;
+                        }
+                    } catch (error) {
+                        console.error('Patient search error:', error);
+                    } finally {
+                        spinner.classList.add('d-none');
+                    }
+                }, 300);
+            });
+        });
+    </script>
+}
+
+<style>
+    .search-container {
+        border: 1px solid var(--color-outline-variant) !important;
+    }
+    .search-container:focus-within {
+        border-color: var(--color-primary) !important;
+        box-shadow: 0 0 0 4px rgba(0, 35, 111, 0.1) !important;
+    }
+    .rounded-xl { border-radius: 1.25rem !important; }
+</style>

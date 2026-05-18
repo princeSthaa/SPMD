@@ -1,0 +1,266 @@
+@page
+@model SPMD.Pages.Inventory.DashboardModel
+@{
+    ViewData["Title"] = "Inventory Precision";
+    var isPharmacist = User.IsInRole("Pharmacist") || User.IsInRole("Admin");
+}
+
+<div class="container mt-4 mb-5">
+    <div class="row align-items-center mb-5 animate__animated animate__fadeIn">
+        <div class="col-md-7">
+            <div class="d-flex align-items-center mb-2">
+                <div class="bg-primary p-2 rounded-lg me-3">
+                    <span class="material-symbols-outlined text-white fs-3">inventory_2</span>
+                </div>
+                <h1 class="display-5 fw-bold text-primary mb-0">Pharmacy Inventory</h1>
+            </div>
+            <p class="text-secondary fs-5 mb-0">Intelligent stock tracking and batch lifecycle management.</p>
+        </div>
+        <div class="col-md-5 text-md-end">
+            @if (isPharmacist)
+            {
+                <button type="button" class="btn btn-primary btn-lg rounded-pill px-4 shadow-md d-inline-flex align-items-center" data-bs-toggle="modal" data-bs-target="#addStockModal">
+                    <span class="material-symbols-outlined me-2">add_box</span>
+                    Add New Batch
+                </button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-outline-primary btn-lg rounded-pill px-4 shadow-sm d-inline-flex align-items-center" data-bs-toggle="modal" data-bs-target="#requestMedicineModal">
+                    <span class="material-symbols-outlined me-2">emergency</span>
+                    Request Medication
+                </button>
+            }
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="search-container card border-0 shadow-sm p-3 rounded-xl bg-white border border-outline-variant">
+                <form method="get" class="row g-3 align-items-center">
+                    <div class="col-md-10">
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-0 ps-3">
+                                <span class="material-symbols-outlined text-secondary">filter_list</span>
+                            </span>
+                            <input type="text" name="searchTerm" value="@Model.SearchTerm" class="form-control border-0 bg-transparent fs-5" placeholder="Filter inventory by medicine name or compound..." />
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-secondary w-100 rounded-pill fw-bold">Apply Filter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        @foreach (var med in Model.Medicines)
+        {
+            var totalStock = med.Batches.Sum(b => b.QuantityAvailable);
+            var isLowStock = totalStock <= med.StockThreshold;
+
+            <div class="col-12 mb-5 animate__animated animate__fadeInUp">
+                <div class="card shadow-sm border-0 rounded-xl overflow-hidden bg-white">
+                    <div class="card-header bg-surface-container-low border-bottom p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-white p-2 rounded-lg border border-outline-variant me-3 shadow-sm">
+                                    <span class="material-symbols-outlined text-primary">medication</span>
+                                </div>
+                                <div>
+                                    <h4 class="mb-0 text-primary fw-bold">@med.MedicineName</h4>
+                                    <span class="text-secondary small uppercase fw-semibold tracking-wider">Manufacturer: @(med.Brand ?? "Generic")</span>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="small text-muted uppercase fw-bold mb-1">Current Inventory Status</div>
+                                <span class="badge rounded-pill px-3 py-2 @(isLowStock ? "bg-error-container text-error border-error" : "bg-success-container text-success border-success")">
+                                    <span class="material-symbols-outlined fs-6 me-1 align-middle">@(isLowStock ? "warning" : "check_circle")</span>
+                                    @totalStock Units Available
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0 align-middle">
+                                <thead class="bg-surface-container-lowest small uppercase text-on-surface-variant fw-bold tracking-tighter">
+                                    <tr>
+                                        <th class="ps-4 py-3">Batch Identifier</th>
+                                        <th class="py-3">Quantity</th>
+                                        <th class="py-3">Expiration Date</th>
+                                        <th class="py-3">Fulfillment Status</th>
+                                        @if (isPharmacist)
+                                        {
+                                            <th class="pe-4 py-3 text-end">Administrative Actions</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody class="font-data-mono">
+                                    @foreach (var batch in med.Batches.OrderBy(b => b.ExpiryDate))
+                                    {
+                                        var isExpired = batch.ExpiryDate <= DateTime.UtcNow;
+                                        var isSoon = batch.ExpiryDate <= DateTime.UtcNow.AddDays(30) && !isExpired;
+
+                                        <tr class="@(isExpired ? "bg-error-container/5" : (isSoon ? "bg-warning-container/5" : ""))">
+                                            <td class="ps-4">
+                                                <span class="bg-surface-container-low px-2 py-1 rounded border border-outline-variant small fw-bold">@batch.BatchNumber</span>
+                                            </td>
+                                            <td class="fw-bold @(batch.QuantityAvailable == 0 ? "text-muted" : "text-on-surface")">
+                                                @batch.QuantityAvailable
+                                            </td>
+                                            <td class="@(isExpired ? "text-error fw-bold" : (isSoon ? "text-warning-dark fw-bold" : "text-on-surface"))">
+                                                @batch.ExpiryDate.ToString("MMM dd, yyyy")
+                                            </td>
+                                            <td>
+                                                @if (isExpired) {
+                                                    <span class="badge bg-error-container text-on-error-container border-error small">EXPIRED</span>
+                                                } else if (isSoon) {
+                                                    <span class="badge bg-warning-container text-on-warning-container border-warning small">EXPIRING SOON</span>
+                                                } else if (batch.QuantityAvailable == 0) {
+                                                    <span class="badge bg-surface-container-high text-secondary border small">DEPLETED / RETIRED</span>
+                                                } else {
+                                                    <span class="badge bg-success-container text-on-success-container border-success small">ACTIVE</span>
+                                                }
+                                            </td>
+                                            @if (isPharmacist)
+                                            {
+                                                <td class="pe-4 text-end">
+                                                    @if (batch.QuantityAvailable > 0)
+                                                    {
+                                                        <form method="post" asp-page-handler="RetireBatch" asp-route-batchId="@batch.MedicineBatchId" class="d-inline" onsubmit="return confirm('Retiring this batch will set its quantity to zero. Proceed with clinical decommissioning?')">
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                                                                <span class="material-symbols-outlined fs-6 align-middle me-1">inventory_2</span>
+                                                                Retire
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" disabled>
+                                                            <span class="material-symbols-outlined fs-6 align-middle me-1">archive</span>
+                                                            Archived
+                                                        </button>
+                                                    }
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@if (isPharmacist)
+{
+    <!-- Add Stock Modal (Pharmacist Only) -->
+    <div class="modal fade" id="addStockModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-xl overflow-hidden">
+                <form method="post" asp-page-handler="AddBatch">
+                    <div class="modal-header bg-primary py-4 px-4 border-0">
+                        <div class="d-flex align-items-center">
+                            <span class="material-symbols-outlined text-white me-3">add_shopping_cart</span>
+                            <h5 class="modal-title text-white fw-bold">Inventory Provisioning</h5>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="mb-4">
+                            <label class="form-label small text-muted uppercase fw-bold mb-2">Select Medication</label>
+                            <select name="MedicineId" class="form-select border-outline-variant focus-primary" required>
+                                @foreach (var med in Model.AllMedicines)
+                                {
+                                    <option value="@med.MedicineId">@med.MedicineName (@med.Brand)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label small text-muted uppercase fw-bold mb-2">Batch Serial Number</label>
+                            <input type="text" name="BatchNumber" class="form-control border-outline-variant font-data-mono" placeholder="e.g. BATCH-2026-X1" required />
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label small text-muted uppercase fw-bold mb-2">Quantity</label>
+                                <input type="number" name="Quantity" class="form-control border-outline-variant text-center font-data-mono" required min="1" />
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label small text-muted uppercase fw-bold mb-2">Expiry Date</label>
+                                <input type="date" name="ExpiryDate" class="form-control border-outline-variant" required />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light border-0 p-4">
+                        <button type="button" class="btn btn-outline-secondary px-4 rounded-pill" data-bs-toggle="modal" data-bs-target="#addStockModal">Cancel</button>
+                        <button type="submit" class="btn btn-primary px-4 rounded-pill fw-bold shadow-sm">Commit Inventory</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <!-- Medication Request Modal (Doctor Only) -->
+    <div class="modal fade" id="requestMedicineModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-xl overflow-hidden">
+                <form method="post" asp-page-handler="RequestMedicine">
+                    <div class="modal-header bg-secondary py-4 px-4 border-0">
+                        <div class="d-flex align-items-center">
+                            <span class="material-symbols-outlined text-white me-3">emergency</span>
+                            <h5 class="modal-title text-white fw-bold">Clinical Medication Request</h5>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="mb-4">
+                            <label class="form-label small text-muted uppercase fw-bold mb-2">Required Medication</label>
+                            <select name="MedicineId" class="form-select border-outline-variant focus-primary" required>
+                                @foreach (var med in Model.AllMedicines)
+                                {
+                                    <option value="@med.MedicineId">@med.MedicineName (@med.Brand)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label small text-muted uppercase fw-bold mb-2">Estimated Quantity Needed</label>
+                            <input type="number" name="Quantity" class="form-control border-outline-variant font-data-mono" required min="1" placeholder="e.g. 50" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small text-muted uppercase fw-bold mb-2">Clinical Reason / Urgency</label>
+                            <textarea name="ClinicalReason" class="form-control border-outline-variant" rows="3" placeholder="e.g. High patient volume, critical shortage in ward..." required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light border-0 p-4">
+                        <button type="button" class="btn btn-outline-secondary px-4 rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-secondary px-4 rounded-pill fw-bold shadow-sm">Submit Clinical Request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .rounded-xl { border-radius: 1rem !important; }
+    .bg-error-container { background-color: #fef2f2; color: #991b1b; }
+    .border-error { border: 1px solid #fecaca; }
+    .bg-success-container { background-color: #ecfdf5; color: #065f46; }
+    .border-success { border: 1px solid #a7f3d0; }
+    .bg-warning-container { background-color: #fffbeb; color: #92400e; }
+    .border-warning { border: 1px solid #fde68a; }
+    .text-warning-dark { color: #854d0e; }
+    .font-data-mono { font-family: var(--font-family-mono); }
+    .shadow-inner-sm { box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05); }
+    .shadow-md { box-shadow: 0 4px 12px rgba(0, 35, 111, 0.15); }
+    .uppercase { text-transform: uppercase; }
+    .tracking-tighter { letter-spacing: -0.05em; }
+    .focus-primary:focus { border-color: var(--color-primary) !important; box-shadow: 0 0 0 2px rgba(0, 35, 111, 0.1) !important; }
+</style>

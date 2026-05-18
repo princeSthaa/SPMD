@@ -1,0 +1,189 @@
+@page "{patientId:int}"
+@model SPMD.Pages.Dispensing.DirectModel
+@{
+    ViewData["Title"] = "Direct Clinical Dispensing";
+}
+
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm border-0 rounded-xl overflow-hidden bg-white animate__animated animate__fadeIn">
+                <div class="card-header bg-success py-4 px-5">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-white/10 p-2 rounded-lg me-3">
+                            <span class="material-symbols-outlined text-white fs-3">bolt</span>
+                        </div>
+                        <div>
+                            <h2 class="h3 mb-0 text-white fw-bold">Direct Medication Fulfillment</h2>
+                            <p class="mb-0 text-white/75 small uppercase tracking-wider fw-semibold">Emergency & Quick Dispense Protocol</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-5">
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert bg-error-container text-on-error-container border-error mb-4 rounded-lg shadow-sm"></div>
+
+                        <!-- Patient Info -->
+                        <div class="p-4 bg-surface-container-low rounded-xl border border-outline-variant mb-5 shadow-inner-sm">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle bg-success me-3">@Model.SelectedPatient?.FirstName?[0]@Model.SelectedPatient?.LastName?[0]</div>
+                                <div>
+                                    <h4 class="text-primary fw-bold mb-0">@Model.SelectedPatient?.FirstName @Model.SelectedPatient?.LastName</h4>
+                                    <span class="text-on-surface-variant small font-data-mono">HEALTH_ID: #@Model.SelectedPatient?.PatientId</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Medication Selection -->
+                        <div class="clinical-section mb-5">
+                            <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-light">
+                                <div class="d-flex align-items-center">
+                                    <span class="material-symbols-outlined text-secondary me-2 fs-5">inventory_2</span>
+                                    <h5 class="text-on-surface fw-bold mb-0 text-uppercase small tracking-widest">Select Compounds for Immediate Release</h5>
+                                </div>
+                                <button type="button" class="btn btn-outline-success btn-sm rounded-pill px-4" id="btnAddMedication">
+                                    <span class="material-symbols-outlined fs-6 me-2">add</span>
+                                    Add Med
+                                </button>
+                            </div>
+                            
+                            <div id="medicationItems">
+                                @for (int i = 0; i < Model.Items.Count; i++)
+                                {
+                                    <div class="med-item card border-outline-variant bg-surface-container-lowest p-4 position-relative shadow-sm mb-3 rounded-lg">
+                                        @if (i > 0)
+                                        {
+                                            <button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-med" aria-label="Remove"></button>
+                                        }
+                                        <div class="row g-4">
+                                            <div class="col-md-6">
+                                                <label class="form-label text-on-surface-variant fw-bold small text-uppercase mb-2">Medication</label>
+                                                <select name="Items[@i].MedicineId" class="form-select border-outline-variant focus-success">
+                                                    <option value="">-- Select Active Inventory --</option>
+                                                    @foreach (var med in Model.MedicineList ?? new SelectList(Enumerable.Empty<SelectListItem>()))
+                                                    {
+                                                        <option value="@med.Value" selected="@(med.Value == Model.Items[i].MedicineId.ToString() ? "selected" : null)">@med.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label text-on-surface-variant fw-bold small text-uppercase mb-2">Quantity</label>
+                                                <input name="Items[@i].Quantity" value="@Model.Items[i].Quantity" class="form-control border-outline-variant text-center font-data-mono" type="number" step="1" min="1" />
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label text-on-surface-variant fw-bold small text-uppercase mb-2">Unit</label>
+                                                <input class="form-control bg-light border-0" value="UNITS" readonly />
+                                                <input type="hidden" name="Items[@i].Dosage" value="Immediate Direct Dispensing" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Safety Check -->
+                        @if (Model.ValidationResult != null && !Model.ValidationResult.IsValid)
+                        {
+                            <div class="alert bg-error-container text-on-error-container border-error shadow-sm mb-4 p-4 rounded-xl animate__animated animate__shakeX">
+                                <h5 class="fw-bold mb-2 d-flex align-items-center">
+                                    <span class="material-symbols-outlined me-2">block</span>
+                                    CRITICAL SAFETY BLOCK
+                                </h5>
+                                <ul class="mb-0 fw-semibold">
+                                    @foreach (var error in Model.ValidationResult.Errors)
+                                    {
+                                        <li>@error</li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+
+                        <!-- Actions -->
+                        <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top">
+                            <a asp-page="/Patients/Search" class="btn btn-outline-secondary px-5 rounded-pill">Cancel</a>
+                            <button type="submit" asp-page-handler="Dispense" class="btn btn-success btn-lg px-5 rounded-pill fw-bold shadow-md d-flex align-items-center">
+                                <span class="material-symbols-outlined me-2">done_all</span>
+                                Release & Record Fulfillment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Template -->
+<template id="medRowTemplate">
+    <div class="med-item card border-outline-variant bg-surface-container-lowest p-4 position-relative shadow-sm mb-3 rounded-lg">
+        <button type="button" class="btn-close position-absolute top-0 end-0 m-3 remove-med" aria-label="Remove"></button>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <label class="form-label text-on-surface-variant fw-bold small text-uppercase mb-2">Medication</label>
+                <select name="Items[INDEX].MedicineId" class="form-select border-outline-variant focus-success">
+                    <option value="">-- Select Active Inventory --</option>
+                    @foreach (var med in Model.MedicineList ?? new SelectList(Enumerable.Empty<SelectListItem>()))
+                    {
+                        <option value="@med.Value">@med.Text</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-on-surface-variant fw-bold small text-uppercase mb-2">Quantity</label>
+                <input name="Items[INDEX].Quantity" class="form-control border-outline-variant text-center font-data-mono" type="number" step="1" min="1" value="1" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-on-surface-variant fw-bold small text-uppercase mb-2">Unit</label>
+                <input class="form-control bg-light border-0" value="UNITS" readonly />
+                <input type="hidden" name="Items[INDEX].Dosage" value="Immediate Direct Dispensing" />
+            </div>
+        </div>
+    </div>
+</template>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('medicationItems');
+            const addButton = document.getElementById('btnAddMedication');
+            const template = document.getElementById('medRowTemplate').innerHTML;
+
+            function updateIndices() {
+                const items = container.querySelectorAll('.med-item');
+                items.forEach((item, index) => {
+                    item.querySelectorAll('[name*="Items["]').forEach(input => {
+                        input.name = input.name.replace(/Items\[\d+\]/, `Items[${index}]`);
+                    });
+                    const removeBtn = item.querySelector('.remove-med');
+                    if (removeBtn) {
+                        removeBtn.onclick = () => { item.remove(); updateIndices(); };
+                    }
+                });
+            }
+
+            addButton.onclick = () => {
+                const index = container.querySelectorAll('.med-item').length;
+                const newRow = template.replace(/INDEX/g, index);
+                container.insertAdjacentHTML('beforeend', newRow);
+                updateIndices();
+            };
+
+            updateIndices();
+        });
+    </script>
+}
+
+<style>
+    .rounded-xl { border-radius: 1.25rem !important; }
+    .avatar-circle {
+        width: 48px; height: 48px;
+        color: white; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 1.1rem;
+    }
+    .focus-success:focus { border-color: #198754 !important; box-shadow: 0 0 0 2px rgba(25, 135, 84, 0.1) !important; }
+    .shadow-inner-sm { box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05); }
+    .bg-error-container { background-color: #fef2f2; color: #991b1b; }
+    .border-error { border: 1px solid #fecaca; }
+</style>

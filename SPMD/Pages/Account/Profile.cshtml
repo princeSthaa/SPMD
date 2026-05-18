@@ -1,0 +1,179 @@
+@page
+@model SPMD.Pages.Account.ProfileModel
+@{
+    ViewData["Title"] = "Professional Profile";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 rounded-xl overflow-hidden bg-white animate__animated animate__fadeIn">
+                <div class="card-header bg-primary py-5 px-5 position-relative">
+                    <div class="position-absolute top-0 end-0 m-4 opacity-10">
+                        <span class="material-symbols-outlined text-white display-1">account_box</span>
+                    </div>
+                    <div class="d-flex align-items-center position-relative z-10">
+                        <div class="bg-white/20 p-1 rounded-circle me-4 border border-white/30">
+                            <div class="avatar-large">
+                                @Model.CurrentUser?.Username[0].ToString().ToUpper()
+                            </div>
+                        </div>
+                        <div>
+                            <h2 class="h2 mb-1 text-white fw-bold">@Model.CurrentUser?.Username</h2>
+                            <p class="mb-0 text-blue-100 uppercase tracking-widest small fw-bold">@Model.CurrentUser?.Role.Name SYSTEM ENTITY</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-5">
+                    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                    {
+                        <div class="alert alert-success alert-dismissible fade show rounded-lg mb-4" role="alert">
+                            <span class="material-symbols-outlined me-2 align-middle">check_circle</span>
+                            @Model.SuccessMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show rounded-lg mb-4" role="alert">
+                            <span class="material-symbols-outlined me-2 align-middle">error</span>
+                            @Model.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <div class="row g-5">
+                        <div class="col-md-6">
+                            <h5 class="text-on-surface-variant fw-bold small text-uppercase tracking-widest mb-4 border-bottom pb-2">Account Identification</h5>
+                            
+                            <div class="mb-4">
+                                <label class="small text-muted mb-1 d-block uppercase fw-bold">Email Address</label>
+                                <div class="d-flex align-items-center p-3 bg-surface-container-low rounded-lg border">
+                                    <span class="material-symbols-outlined text-primary me-3">mail</span>
+                                    <span class="text-on-surface fw-semibold">@Model.CurrentUser?.Email</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="small text-muted mb-1 d-block uppercase fw-bold">System Role</label>
+                                <div class="d-flex align-items-center p-3 bg-surface-container-low rounded-lg border">
+                                    <span class="material-symbols-outlined text-primary me-3">badge</span>
+                                    <span class="badge bg-primary-container text-white px-3">@Model.CurrentUser?.Role.Name</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h5 class="text-on-surface-variant fw-bold small text-uppercase tracking-widest mb-4 border-bottom pb-2">Security & Status</h5>
+                            
+                            <div class="mb-4">
+                                <label class="small text-muted mb-1 d-block uppercase fw-bold">Account Status</label>
+                                <div class="d-flex align-items-center p-3 bg-surface-container-low rounded-lg border">
+                                    <span class="material-symbols-outlined text-success me-3">verified</span>
+                                    <span class="text-success fw-bold">ACTIVE & VERIFIED</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="small text-muted mb-1 d-block uppercase fw-bold">Member Since</label>
+                                <div class="d-flex align-items-center p-3 bg-surface-container-low rounded-lg border">
+                                    <span class="material-symbols-outlined text-primary me-3">calendar_today</span>
+                                    <span class="text-on-surface fw-semibold">@Model.CurrentUser?.CreatedAt.ToString("MMM dd, yyyy")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 pt-4 border-top border-outline-variant/30 d-flex justify-content-between">
+                        <button class="btn btn-outline-primary px-4 rounded-pill fw-bold" data-bs-toggle="modal" data-bs-target="#editCredentialsModal">
+                            <span class="material-symbols-outlined fs-5 me-2">edit</span>
+                            Edit Credentials
+                        </button>
+                        <button class="btn btn-outline-secondary px-4 rounded-pill fw-bold" data-bs-toggle="modal" data-bs-target="#updatePasswordModal">
+                            <span class="material-symbols-outlined fs-5 me-2">lock_reset</span>
+                            Update Password
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Credentials Modal -->
+<div class="modal fade" id="editCredentialsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-xl">
+            <div class="modal-header bg-surface-container-low border-0 p-4">
+                <h5 class="modal-title fw-bold text-primary">Update Clinical Credentials</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" asp-page-handler="UpdateEmail">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Primary Email Address</label>
+                        <input asp-for="NewEmail" class="form-control rounded-lg border-outline-variant" placeholder="Clinician Email" required />
+                    </div>
+                    <p class="small text-muted mb-0">Note: Updating your email may require re-verification for certain clinical protocols.</p>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Update Password Modal -->
+<div class="modal fade" id="updatePasswordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-xl">
+            <div class="modal-header bg-surface-container-low border-0 p-4">
+                <h5 class="modal-title fw-bold text-primary">Security: Update Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" asp-page-handler="UpdatePassword">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Current Password</label>
+                        <input type="password" asp-for="CurrentPassword" class="form-control rounded-lg border-outline-variant" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-uppercase text-muted">New Password</label>
+                        <input type="password" asp-for="NewPassword" class="form-control rounded-lg border-outline-variant" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Confirm New Password</label>
+                        <input type="password" asp-for="ConfirmPassword" class="form-control rounded-lg border-outline-variant" required />
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-secondary rounded-pill px-4 fw-bold">Update Security</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .rounded-xl { border-radius: 1.5rem !important; }
+    .avatar-large {
+        width: 80px;
+        height: 80px;
+        background-color: white;
+        color: var(--color-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 2.5rem;
+    }
+    .bg-primary-container { background-color: #1e3a8a !important; }
+    .uppercase { text-transform: uppercase; }
+    .tracking-widest { letter-spacing: 0.15em; }
+</style>

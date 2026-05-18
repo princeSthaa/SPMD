@@ -1,0 +1,139 @@
+@page
+@model SPMD.Pages.Patient.IndexModel
+@{
+    ViewData["Title"] = "My Dashboard";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <h2 class="display-6">Welcome, @Model.PatientInfo?.FirstName @Model.PatientInfo?.LastName</h2>
+            <p class="text-muted">Manage your prescriptions and view your clinical history.</p>
+        </div>
+    </div>
+
+    @if (Model.PatientInfo == null)
+    {
+        <div class="alert alert-warning">
+            Your account is not yet linked to a clinical patient record. Please contact the clinic administrator.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <!-- Summary Cards -->
+            <div class="col-md-4 mb-4">
+                <div class="card bg-primary text-white shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Active Prescriptions</h5>
+                        <p class="display-4">@Model.Prescriptions.Count(p => p.Status == SPMD.Models.PrescriptionStatus.Issued)</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card bg-danger text-white shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Recorded Allergies</h5>
+                        <p class="display-4">@Model.PatientInfo.AllergyRecords.Count</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card bg-success text-white shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Dispensing Events</h5>
+                        <p class="display-4">@Model.PatientInfo.DispensingRecords.Count</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <!-- Prescription List -->
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h4 class="mb-0">My Prescriptions</h4>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Prescriptions.Any())
+                        {
+                            <div class="list-group list-group-flush">
+                                @foreach (var p in Model.Prescriptions)
+                                {
+                                    <div class="list-group-item px-0 py-3">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h5 class="mb-1 text-primary">#@p.PrescriptionNumber.Substring(0, 8)</h5>
+                                            <small class="text-muted">@p.IssuedAt.ToString("MMM dd, yyyy")</small>
+                                        </div>
+                                        <p class="mb-1"><strong>Doctor:</strong> Dr. @p.Doctor?.LastName</p>
+                                        <div class="mt-2">
+                                            @foreach (var item in p.Items)
+                                            {
+                                                <span class="badge bg-light text-dark border me-1">@item.Medicine.MedicineName (@item.Dosage)</span>
+                                            }
+                                        </div>
+                                        <div class="mt-2">
+                                            @if (p.Status == SPMD.Models.PrescriptionStatus.Issued)
+                                            {
+                                                <span class="badge bg-success">Ready for Collection</span>
+                                            }
+                                            else if (p.Status == SPMD.Models.PrescriptionStatus.Dispensed)
+                                            {
+                                                <span class="badge bg-secondary">Collected</span>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-center py-4">No prescriptions found.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Allergy List -->
+            <div class="col-md-4">
+                <div class="card shadow-sm mb-4 border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">My Allergies</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.PatientInfo.AllergyRecords.Any())
+                        {
+                            <ul class="list-unstyled mb-0">
+                                @foreach (var allergy in Model.PatientInfo.AllergyRecords)
+                                {
+                                    <li class="mb-2">
+                                        <strong>@allergy.Substance:</strong> 
+                                        <span class="text-danger">@allergy.Severity</span>
+                                        <div class="small text-muted">Reaction: @allergy.Reaction</div>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <p class="mb-0">No allergies recorded.</p>
+                        }
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-info">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a asp-page="/Medicines/Search" class="btn btn-outline-info">Search Medicine Stock</a>
+                            <a asp-page="/Account/Profile" class="btn btn-outline-secondary">Update My Profile</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

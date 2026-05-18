@@ -1,0 +1,100 @@
+@page
+@model SPMD.Pages.Medicines.SearchModel
+@{
+    ViewData["Title"] = "Inventory Search";
+}
+
+<div class="container mt-4">
+    <div class="row align-items-center mb-5 animate__animated animate__fadeIn">
+        <div class="col-md-7">
+            <div class="d-flex align-items-center mb-2">
+                <div class="bg-secondary-container p-2 rounded-lg me-3">
+                    <span class="material-symbols-outlined text-primary">inventory_2</span>
+                </div>
+                <h1 class="display-5 fw-bold text-primary mb-0">Clinical Inventory</h1>
+            </div>
+            <p class="text-secondary fs-5 mb-0">Real-time medication availability and manufacturer tracking.</p>
+        </div>
+        <div class="col-md-5 text-md-end">
+            <div class="d-inline-flex align-items-center bg-surface-container-high px-4 py-2 rounded-pill">
+                <span class="material-symbols-outlined text-primary me-2">update</span>
+                <span class="text-on-surface-variant small fw-bold">LAST SYNC: @DateTime.Now.ToString("HH:mm")</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-10">
+            <div class="search-container card border-0 shadow-lg p-2 rounded-pill bg-white">
+                <div class="input-group input-group-lg border-0">
+                    <span class="input-group-text bg-transparent border-0 ps-4">
+                        <span class="material-symbols-outlined text-primary fs-3">search</span>
+                    </span>
+                    <input type="text" id="searchInput" value="@Model.SearchTerm" class="form-control border-0 bg-transparent fs-5 ps-2" placeholder="Search by name, generic ingredient, or company (e.g., GSK, Panadol)..." />
+                    <div id="searchSpinner" class="spinner-border spinner-border-sm text-primary position-absolute end-0 top-50 translate-middle-y me-4 d-none" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center gap-4 mt-3">
+                <div class="d-flex align-items-center small text-on-surface-variant">
+                    <span class="material-symbols-outlined text-success fs-6 me-1">check_circle</span>
+                    <span>Generic Matching</span>
+                </div>
+                <div class="d-flex align-items-center small text-on-surface-variant">
+                    <span class="material-symbols-outlined text-success fs-6 me-1">check_circle</span>
+                    <span>Brand Tracking</span>
+                </div>
+                <div class="d-flex align-items-center small text-on-surface-variant">
+                    <span class="material-symbols-outlined text-success fs-6 me-1">check_circle</span>
+                    <span>Live Stock</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="searchResults" class="animate__animated animate__fadeIn">
+        <partial name="_MedicineSearchResults" model="Model.SearchResults" />
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const resultsContainer = document.getElementById('searchResults');
+            const spinner = document.getElementById('searchSpinner');
+            let timeout = null;
+
+            searchInput.addEventListener('input', function() {
+                clearTimeout(timeout);
+                spinner.classList.remove('d-none');
+                
+                timeout = setTimeout(async () => {
+                    const searchTerm = searchInput.value;
+                    try {
+                        const response = await fetch(`?handler=SearchPartial&searchTerm=${encodeURIComponent(searchTerm)}`);
+                        if (response.ok) {
+                            const html = await response.text();
+                            resultsContainer.innerHTML = html;
+                        }
+                    } catch (error) {
+                        console.error('Search error:', error);
+                    } finally {
+                        spinner.classList.add('d-none');
+                    }
+                }, 300); // 300ms debounce
+            });
+        });
+    </script>
+}
+
+<style>
+    .search-container {
+        border: 1px solid var(--color-outline-variant) !important;
+    }
+    .search-container:focus-within {
+        border-color: var(--color-primary) !important;
+        box-shadow: 0 0 0 4px rgba(0, 35, 111, 0.1) !important;
+    }
+</style>

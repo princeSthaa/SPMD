@@ -1,0 +1,118 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+    <meta charset="utf-8">
+    <title>Internship Project Proposal</title>
+    <style>
+        body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.5; }
+        h1 { font-size: 16pt; text-align: center; text-transform: uppercase; font-weight: bold; }
+        h2 { font-size: 14pt; border-bottom: 1px solid #000; margin-top: 20px; font-weight: bold; }
+        h3 { font-size: 12pt; font-weight: bold; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid black; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .center { text-align: center; }
+        .footer { margin-top: 50px; }
+        .page-break { page-break-before: always; }
+    </style>
+</head>
+<body>
+    <div class="center">
+        <br><br><br>
+        <h1>INTERNSHIP PROJECT PROPOSAL</h1>
+        <br>
+        <h1>Smart Prescription and Medication Dispensing System (SPMD)</h1>
+        <br><br>
+        <p><strong>Submitted To:</strong></p>
+        <p>Department of Computer Application</p>
+        <p>[College Name]</p>
+        <br><br>
+        <p><strong>In Partial Fulfillment of the Requirements for the Degree of</strong></p>
+        <p>Bachelor of Computer Application (BCA)</p>
+        <br><br><br>
+        <p><strong>Submitted By:</strong></p>
+        <p><strong>[Your Full Name]</strong></p>
+        <p>BCA 7th Semester</p>
+        <p>Exam Roll No. / TU Regd. No.: [Your ID]</p>
+        <br><br>
+        <p><strong>Date:</strong> May 17, 2026</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>1. INTRODUCTION</h2>
+    <h3>1.1 Background</h3>
+    <p>The integration of Information Technology in the healthcare sector has become a necessity to ensure patient safety and operational efficiency. Manual prescription handling often leads to errors in dispensing, drug-allergy interactions, and inventory mismanagement. The Smart Prescription and Medication Dispensing System (SPMD) is designed to automate the clinical workflow, from doctor consultation to pharmacy fulfillment, ensuring "Clinical Precision."</p>
+
+    <h3>1.2 Host Organization Profile</h3>
+    <p>The project is being developed under the guidance of [Host Organization Name], located at [Location]. The organization specializes in medical software solutions and clinical decision support systems.</p>
+
+    <h2>2. STATEMENT OF THE PROBLEM</h2>
+    <p>Traditional medical systems suffer from several bottlenecks:</p>
+    <ul>
+        <li><strong>Safety Risks:</strong> Difficulty in tracking patient allergy profiles in real-time during prescribing.</li>
+        <li><strong>Inventory Inefficiency:</strong> Manual tracking of medicine batches often results in stock expiration or shortages.</li>
+        <li><strong>Role Confusion:</strong> Overlapping responsibilities between doctors and pharmacists can lead to clinical accountability issues.</li>
+        <li><strong>Lack of Auditability:</strong> Difficulty in tracking the forensic trail of clinical decisions.</li>
+    </ul>
+
+    <h2>3. OBJECTIVES</h2>
+    <h3>3.1 General Objective</h3>
+    <p>To develop and implement a robust, role-based clinical management system that ensures safe medication dispensing and intelligent inventory tracking.</p>
+    <h3>3.2 Specific Objectives</h3>
+    <ul>
+        <li>To implement an Allergy Safety Engine that provides real-time warnings and hard blocks during prescribing.</li>
+        <li>To develop a FEFO (First-Expired-First-Out) dispensing logic to optimize inventory turnover.</li>
+        <li>To establish a clear Role-Based Access Control (RBAC) system for Doctors, Pharmacists, and Patients.</li>
+        <li>To create a Forensic Audit Trail for tracking all clinical actions and dispensing records.</li>
+        <li>To gain hands-on experience in ASP.NET Core 10.0 and Entity Framework Core.</li>
+    </ul>
+
+    <h2>4. METHODOLOGY</h2>
+    <p>The project follows the Agile Software Development Life Cycle (SDLC), focusing on iterative development and clinical validation. This includes Requirement Analysis, System Design (ER Diagrams/Schema), Implementation using C#, and exhaustive Testing/Validation of clinical safety logic.</p>
+
+    <h2>5. TOOLS AND TECHNOLOGIES</h2>
+    <ul>
+        <li><strong>Framework:</strong> ASP.NET Core 10.0 (Razor Pages)</li>
+        <li><strong>Database:</strong> Microsoft SQL Server with EF Core</li>
+        <li><strong>Frontend:</strong> HTML5, CSS3, JavaScript (AJAX/Fetch)</li>
+        <li><strong>IDE:</strong> Visual Studio / VS Code</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <h2>6. INTERNSHIP WORK PLAN (8-WEEK TIMELINE)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Week</th>
+                <th>Phase</th>
+                <th>Activities</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Week 1</td><td>Orientation</td><td>Environment setup, project scope definition, and tech stack onboarding.</td></tr>
+            <tr><td>Week 2</td><td>Design & DB</td><td>Finalizing the ER Diagram, Database schema design, and EF Core Migrations.</td></tr>
+            <tr><td>Week 3</td><td>Core Clinical</td><td>Implementing User Authentication, RBAC, and Profile management.</td></tr>
+            <tr><td>Week 4</td><td>Safety Engine</td><td>Developing the Allergy Cross-Referencing and DDI logic.</td></tr>
+            <tr><td>Week 5</td><td>Inventory</td><td>Building the Medicine Batch management and FEFO dispensing logic.</td></tr>
+            <tr><td>Week 6</td><td>UI/UX Refinement</td><td>Implementing AJAX search, Product Card design, and Clinical Dashboards.</td></tr>
+            <tr><td>Week 7</td><td>Testing & Fixes</td><td>Debugging login role validation, fixing UI broken links, and unit testing.</td></tr>
+            <tr><td>Week 8</td><td>Documentation</td><td>Finalizing the project report, generating prescription PDFs, and defense.</td></tr>
+        </tbody>
+    </table>
+
+    <h2>7. EXPECTED OUTCOMES</h2>
+    <ul>
+        <li>A fully functional SPMD System with role-restricted workspaces.</li>
+        <li>An automated Safety Alert System for allergies and stock thresholds.</li>
+        <li>Professional proficiency in full-stack .NET development.</li>
+        <li>Final Internship Report and Certificate of Completion.</li>
+    </ul>
+
+    <div class="footer">
+        <p>__________________________</p>
+        <p><strong>[Your Full Name]</strong></p>
+        <p>Applicant</p>
+    </div>
+</body>
+</html>
