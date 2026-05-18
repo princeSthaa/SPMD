@@ -25,6 +25,24 @@ namespace SPMD.Pages.Account
         public string? NewEmail { get; set; }
 
         [BindProperty]
+        public string? FirstName { get; set; }
+
+        [BindProperty]
+        public string? LastName { get; set; }
+
+        [BindProperty]
+        public string? PhoneNumber { get; set; }
+
+        [BindProperty]
+        public DateTime? BirthDate { get; set; }
+
+        [BindProperty]
+        public string? HospitalEmployeeNumber { get; set; }
+
+        [BindProperty]
+        public string? HealthId { get; set; }
+
+        [BindProperty]
         public string? CurrentPassword { get; set; }
 
         [BindProperty]
@@ -39,6 +57,54 @@ namespace SPMD.Pages.Account
         public async Task OnGetAsync()
         {
             await LoadUserAsync();
+        }
+
+        public async Task<IActionResult> OnPostUpdateProfileAsync()
+        {
+            await LoadUserAsync();
+            if (CurrentUser == null) return Page();
+
+            if (string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName))
+            {
+                ErrorMessage = "First Name and Last Name are required.";
+                return Page();
+            }
+
+            if (!string.IsNullOrWhiteSpace(NewEmail)) CurrentUser.Email = NewEmail;
+
+            _context.Users.Update(CurrentUser);
+
+            if (CurrentUser.Role.Name == RoleName.Doctor && CurrentUser.DoctorProfile != null)
+            {
+                CurrentUser.DoctorProfile.FirstName = FirstName;
+                CurrentUser.DoctorProfile.LastName = LastName;
+                if (BirthDate.HasValue) CurrentUser.DoctorProfile.BirthDate = BirthDate.Value;
+                CurrentUser.DoctorProfile.Contact = PhoneNumber;
+                CurrentUser.DoctorProfile.HospitalEmployeeNumber = HospitalEmployeeNumber;
+                _context.Doctors.Update(CurrentUser.DoctorProfile);
+            }
+            else if (CurrentUser.Role.Name == RoleName.Pharmacist && CurrentUser.PharmacistProfile != null)
+            {
+                CurrentUser.PharmacistProfile.FirstName = FirstName;
+                CurrentUser.PharmacistProfile.LastName = LastName;
+                if (BirthDate.HasValue) CurrentUser.PharmacistProfile.BirthDate = BirthDate.Value;
+                CurrentUser.PharmacistProfile.Phone = PhoneNumber;
+                CurrentUser.PharmacistProfile.HospitalEmployeeNumber = HospitalEmployeeNumber;
+                _context.Pharmacists.Update(CurrentUser.PharmacistProfile);
+            }
+            else if (CurrentUser.Role.Name == RoleName.Patient && CurrentUser.PatientProfile != null)
+            {
+                CurrentUser.PatientProfile.FirstName = FirstName;
+                CurrentUser.PatientProfile.LastName = LastName;
+                if (BirthDate.HasValue) CurrentUser.PatientProfile.BirthDate = BirthDate.Value;
+                CurrentUser.PatientProfile.Phone = PhoneNumber ?? "";
+                CurrentUser.PatientProfile.HealthId = HealthId;
+                _context.Patients.Update(CurrentUser.PatientProfile);
+            }
+
+            await _context.SaveChangesAsync();
+            SuccessMessage = "Profile updated successfully.";
+            return Page();
         }
 
         public async Task<IActionResult> OnPostUpdateEmailAsync()
@@ -94,11 +160,42 @@ namespace SPMD.Pages.Account
             {
                 CurrentUser = await _context.Users
                     .Include(u => u.Role)
+                    .Include(u => u.DoctorProfile)
+                    .Include(u => u.PharmacistProfile)
+                    .Include(u => u.PatientProfile)
                     .FirstOrDefaultAsync(u => u.UserId == userId);
                 
-                if (CurrentUser != null && string.IsNullOrEmpty(NewEmail))
+                if (CurrentUser != null)
                 {
-                    NewEmail = CurrentUser.Email;
+                    if (string.IsNullOrEmpty(NewEmail)) NewEmail = CurrentUser.Email;
+                    
+                    if (string.IsNullOrEmpty(FirstName))
+                    {
+                        if (CurrentUser.Role.Name == RoleName.Doctor && CurrentUser.DoctorProfile != null)
+                        {
+                            FirstName = CurrentUser.DoctorProfile.FirstName;
+                            LastName = CurrentUser.DoctorProfile.LastName;
+                            PhoneNumber = CurrentUser.DoctorProfile.Contact;
+                            BirthDate = CurrentUser.DoctorProfile.BirthDate;
+                            HospitalEmployeeNumber = CurrentUser.DoctorProfile.HospitalEmployeeNumber;
+                        }
+                        else if (CurrentUser.Role.Name == RoleName.Pharmacist && CurrentUser.PharmacistProfile != null)
+                        {
+                            FirstName = CurrentUser.PharmacistProfile.FirstName;
+                            LastName = CurrentUser.PharmacistProfile.LastName;
+                            PhoneNumber = CurrentUser.PharmacistProfile.Phone;
+                            BirthDate = CurrentUser.PharmacistProfile.BirthDate;
+                            HospitalEmployeeNumber = CurrentUser.PharmacistProfile.HospitalEmployeeNumber;
+                        }
+                        else if (CurrentUser.Role.Name == RoleName.Patient && CurrentUser.PatientProfile != null)
+                        {
+                            FirstName = CurrentUser.PatientProfile.FirstName;
+                            LastName = CurrentUser.PatientProfile.LastName;
+                            PhoneNumber = CurrentUser.PatientProfile.Phone;
+                            BirthDate = CurrentUser.PatientProfile.BirthDate;
+                            HealthId = CurrentUser.PatientProfile.HealthId;
+                        }
+                    }
                 }
             }
         }

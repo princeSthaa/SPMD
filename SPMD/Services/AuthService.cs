@@ -14,12 +14,14 @@ namespace SPMD.Services
         private readonly UserService _userService;
         private readonly IConfiguration _configuration;
         private readonly AppDbContext _context;
+        private readonly IEmailService _emailService;
 
-        public AuthService(UserService userService, IConfiguration configuration, AppDbContext context)
+        public AuthService(UserService userService, IConfiguration configuration, AppDbContext context, IEmailService emailService)
         {
             _userService = userService;
             _configuration = configuration;
             _context = context;
+            _emailService = emailService;
         }
 
         public async Task<AuthResponseDto?> LoginAsync(LoginDto loginDto)
@@ -27,6 +29,13 @@ namespace SPMD.Services
             var user = await _userService.GetByUsernameAsync(loginDto.Username);
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
             {
+                return null;
+            }
+
+            if (!user.IsActive)
+            {
+                // In a real app we might throw a specific exception or return a different result, 
+                // but for now we'll just return null if they are not verified/active.
                 return null;
             }
 
@@ -50,13 +59,16 @@ namespace SPMD.Services
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                string otpCode = new Random().Next(100000, 999999).ToString();
                 var user = new User
                 {
                     Username = registerDto.Username,
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
                     Email = registerDto.Email,
                     RoleId = targetRole.RoleId,
-                    IsActive = true
+                    IsActive = false,
+                    VerificationCode = otpCode,
+                    VerificationCodeExpiry = DateTime.UtcNow.AddMinutes(15)
                 };
 
                 await _userService.CreateAsync(user);
@@ -65,18 +77,52 @@ namespace SPMD.Services
                 switch ((RoleName)registerDto.RoleId)
                 {
                     case RoleName.Doctor:
-                        _context.Doctors.Add(new Doctor { UserId = user.UserId, FirstName = user.Username, LastName = "(Pending Profile Setup)" });
+                        _context.Doctors.Add(new Doctor 
+                        { 
+                            UserId = user.UserId, 
+                            FirstName = registerDto.FirstName, 
+                            LastName = registerDto.LastName,
+                            BirthDate = registerDto.BirthDate,
+                            HospitalEmployeeNumber = registerDto.HospitalEmployeeNumber,
+                            Contact = registerDto.PhoneNumber
+                        });
                         break;
                     case RoleName.Pharmacist:
-                        _context.Pharmacists.Add(new Pharmacist { UserId = user.UserId, FirstName = user.Username, LastName = "(Pending Profile Setup)" });
+                        _context.Pharmacists.Add(new Pharmacist 
+                        { 
+                            UserId = user.UserId, 
+                            FirstName = registerDto.FirstName, 
+                            LastName = registerDto.LastName,
+                            BirthDate = registerDto.BirthDate,
+                            HospitalEmployeeNumber = registerDto.HospitalEmployeeNumber,
+                            Phone = registerDto.PhoneNumber
+                        });
                         break;
                     case RoleName.Patient:
-                        _context.Patients.Add(new Patient { UserId = user.UserId, FirstName = user.Username, LastName = "(Pending Profile Setup)", Gender = "U" });
+                        _context.Patients.Add(new Patient 
+                        { 
+                            UserId = user.UserId, 
+                            FirstName = registerDto.FirstName, 
+                            LastName = registerDto.LastName,
+                            BirthDate = registerDto.BirthDate,
+                            HealthId = registerDto.HealthId,
+                            Phone = registerDto.PhoneNumber,
+                            Email = registerDto.Email,
+                            Gender = "U" 
+                        });
                         break;
                 }
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
+
+                // Send OTP Email
+                await _emailService.SendEmailAsync(
+                    user.Email,
+                    "Verify your SPMD Account",
+                    $"<h2>Welcome to SPMD!</h2><p>Your email verification code is: <strong>{otpCode}</strong></p><p>This code will expire in 15 minutes.</p>"
+                );
+
                 return user;
             }
             catch (Exception)

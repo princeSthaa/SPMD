@@ -10,8 +10,10 @@ namespace SPMD.Models
     public string Email { get; set; } = string.Empty;
     public int RoleId { get; set; }
     public Role Role { get; set; } = null!;
-    public bool IsActive { get; set; } = true;
+    public bool IsActive { get; set; } = false;
     public bool RequiresPasswordChange { get; set; } = false;
+    public string? VerificationCode { get; set; }
+    public DateTime? VerificationCodeExpiry { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     // Optional links to domain entities

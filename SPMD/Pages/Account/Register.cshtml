@@ -82,6 +82,38 @@
             <form method="post" class="space-y-6">
                 <div asp-validation-summary="ModelOnly" class="text-red-600 text-sm"></div>
 
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- First Name -->
+                    <div>
+                        <label asp-for="Input.FirstName" class="block text-xs font-semibold uppercase tracking-wider text-on-surface mb-1">First Name</label>
+                        <input asp-for="Input.FirstName" required class="w-full px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all shadow-sm" placeholder="Jane" />
+                        <span asp-validation-for="Input.FirstName" class="text-red-600 text-xs mt-1"></span>
+                    </div>
+
+                    <!-- Last Name -->
+                    <div>
+                        <label asp-for="Input.LastName" class="block text-xs font-semibold uppercase tracking-wider text-on-surface mb-1">Last Name</label>
+                        <input asp-for="Input.LastName" required class="w-full px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all shadow-sm" placeholder="Doe" />
+                        <span asp-validation-for="Input.LastName" class="text-red-600 text-xs mt-1"></span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Phone Number -->
+                    <div>
+                        <label asp-for="Input.PhoneNumber" class="block text-xs font-semibold uppercase tracking-wider text-on-surface mb-1">Phone Number</label>
+                        <input asp-for="Input.PhoneNumber" required class="w-full px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all shadow-sm" placeholder="(555) 123-4567" />
+                        <span asp-validation-for="Input.PhoneNumber" class="text-red-600 text-xs mt-1"></span>
+                    </div>
+
+                    <!-- Birth Date -->
+                    <div>
+                        <label asp-for="Input.BirthDate" class="block text-xs font-semibold uppercase tracking-wider text-on-surface mb-1">Birth Date</label>
+                        <input asp-for="Input.BirthDate" type="date" required class="w-full px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all shadow-sm" />
+                        <span asp-validation-for="Input.BirthDate" class="text-red-600 text-xs mt-1"></span>
+                    </div>
+                </div>
+
                 <!-- Username -->
                 <div>
                     <label asp-for="Input.Username" class="block text-xs font-semibold uppercase tracking-wider text-on-surface mb-1">Username</label>
@@ -123,21 +155,21 @@
                     <label class="block text-xs font-semibold uppercase tracking-wider text-on-surface mb-2">Select Your Role</label>
                     <div class="grid grid-cols-3 gap-3">
                         <label class="cursor-pointer">
-                            <input type="radio" asp-for="Input.RoleId" value="2" class="peer sr-only" checked />
+                            <input type="radio" asp-for="Input.RoleId" value="2" class="peer sr-only role-selector" checked />
                             <div class="flex flex-col items-center justify-center py-3 px-2 border border-outline-variant rounded-lg bg-surface-container-lowest peer-checked:border-primary peer-checked:bg-secondary-container/20 peer-checked:ring-1 peer-checked:ring-primary transition-all text-center">
                                 <span class="material-symbols-outlined text-secondary mb-1 peer-checked:text-primary">stethoscope</span>
                                 <span class="text-xs font-medium text-on-surface-variant peer-checked:text-primary">Doctor</span>
                             </div>
                         </label>
                         <label class="cursor-pointer">
-                            <input type="radio" asp-for="Input.RoleId" value="1" class="peer sr-only" />
+                            <input type="radio" asp-for="Input.RoleId" value="1" class="peer sr-only role-selector" />
                             <div class="flex flex-col items-center justify-center py-3 px-2 border border-outline-variant rounded-lg bg-surface-container-lowest peer-checked:border-primary peer-checked:bg-secondary-container/20 peer-checked:ring-1 peer-checked:ring-primary transition-all text-center">
                                 <span class="material-symbols-outlined text-secondary mb-1 peer-checked:text-primary">prescriptions</span>
                                 <span class="text-xs font-medium text-on-surface-variant peer-checked:text-primary">Pharmacist</span>
                             </div>
                         </label>
                         <label class="cursor-pointer">
-                            <input type="radio" asp-for="Input.RoleId" value="4" class="peer sr-only" />
+                            <input type="radio" asp-for="Input.RoleId" value="4" class="peer sr-only role-selector" />
                             <div class="flex flex-col items-center justify-center py-3 px-2 border border-outline-variant rounded-lg bg-surface-container-lowest peer-checked:border-primary peer-checked:bg-secondary-container/20 peer-checked:ring-1 peer-checked:ring-primary transition-all text-center">
                                 <span class="material-symbols-outlined text-secondary mb-1 peer-checked:text-primary">person</span>
                                 <span class="text-xs font-medium text-on-surface-variant peer-checked:text-primary">Patient</span>
@@ -145,6 +177,19 @@
                         </label>
                     </div>
                     <span asp-validation-for="Input.RoleId" class="text-red-600 text-xs mt-1"></span>
+                </div>
+                
+                <!-- Dynamic Identifiers -->
+                <div id="staffIdentifierContainer">
+                    <label asp-for="Input.HospitalEmployeeNumber" class="block text-xs font-semibold uppercase tracking-wider text-on-surface mb-1">Hospital Employee Number</label>
+                    <input asp-for="Input.HospitalEmployeeNumber" class="w-full px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all shadow-sm" placeholder="EMP-12345" />
+                    <span asp-validation-for="Input.HospitalEmployeeNumber" class="text-red-600 text-xs mt-1"></span>
+                </div>
+
+                <div id="patientIdentifierContainer" class="hidden">
+                    <label asp-for="Input.HealthId" class="block text-xs font-semibold uppercase tracking-wider text-on-surface mb-1">Health ID</label>
+                    <input asp-for="Input.HealthId" class="w-full px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all shadow-sm" placeholder="HLT-98765" />
+                    <span asp-validation-for="Input.HealthId" class="text-red-600 text-xs mt-1"></span>
                 </div>
 
                 <!-- Submit Button -->
@@ -163,5 +208,33 @@
             </div>
         </div>
     </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const roleSelectors = document.querySelectorAll('.role-selector');
+            const staffIdentifierContainer = document.getElementById('staffIdentifierContainer');
+            const patientIdentifierContainer = document.getElementById('patientIdentifierContainer');
+
+            function toggleIdentifiers() {
+                let selectedRadio = document.querySelector('.role-selector:checked');
+                if(!selectedRadio) return;
+                let selectedRole = selectedRadio.value;
+                if (selectedRole === '4') { // Patient
+                    staffIdentifierContainer.classList.add('hidden');
+                    patientIdentifierContainer.classList.remove('hidden');
+                } else {
+                    staffIdentifierContainer.classList.remove('hidden');
+                    patientIdentifierContainer.classList.add('hidden');
+                }
+            }
+
+            roleSelectors.forEach(selector => {
+                selector.addEventListener('change', toggleIdentifiers);
+            });
+
+            // Initial toggle based on checked state
+            toggleIdentifiers();
+        });
+    </script>
 </body>
 </html>

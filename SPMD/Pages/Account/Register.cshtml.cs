@@ -20,6 +20,7 @@ namespace SPMD.Pages.Account
 
         public void OnGet()
         {
+            Input.BirthDate = DateTime.Today;
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -36,7 +37,7 @@ namespace SPMD.Pages.Account
                 return Page();
             }
 
-            return RedirectToPage("./Login");
+            return RedirectToPage("./VerifyEmail", new { email = user.Email });
         }
     }
 }

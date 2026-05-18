@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SmartPrescriptionAndMedicationDispensingSystem")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+573919242d6551c4ea1598827bdee5d01561bc27")]
 [assembly: System.Reflection.AssemblyProductAttribute("SmartPrescriptionAndMedicationDispensingSystem")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SmartPrescriptionAndMedicationDispensingSystem")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

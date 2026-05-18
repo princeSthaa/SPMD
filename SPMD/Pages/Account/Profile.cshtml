@@ -89,7 +89,7 @@
                     <div class="mt-5 pt-4 border-top border-outline-variant/30 d-flex justify-content-between">
                         <button class="btn btn-outline-primary px-4 rounded-pill fw-bold" data-bs-toggle="modal" data-bs-target="#editCredentialsModal">
                             <span class="material-symbols-outlined fs-5 me-2">edit</span>
-                            Edit Credentials
+                            Edit Profile
                         </button>
                         <button class="btn btn-outline-secondary px-4 rounded-pill fw-bold" data-bs-toggle="modal" data-bs-target="#updatePasswordModal">
                             <span class="material-symbols-outlined fs-5 me-2">lock_reset</span>
@@ -102,23 +102,55 @@
     </div>
 </div>
 
-<!-- Edit Credentials Modal -->
+<!-- Edit Profile Modal -->
 <div class="modal fade" id="editCredentialsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow-lg rounded-xl">
             <div class="modal-header bg-surface-container-low border-0 p-4">
-                <h5 class="modal-title fw-bold text-primary">Update Clinical Credentials</h5>
+                <h5 class="modal-title fw-bold text-primary">Update Profile Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="post" asp-page-handler="UpdateEmail">
+            <form method="post" asp-page-handler="UpdateProfile">
                 <div class="modal-body p-4">
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-uppercase text-muted">Primary Email Address</label>
-                        <input asp-for="NewEmail" class="form-control rounded-lg border-outline-variant" placeholder="Clinician Email" required />
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-uppercase text-muted">First Name</label>
+                            <input asp-for="FirstName" class="form-control rounded-lg border-outline-variant" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-uppercase text-muted">Last Name</label>
+                            <input asp-for="LastName" class="form-control rounded-lg border-outline-variant" required />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label small fw-bold text-uppercase text-muted">Primary Email Address</label>
+                            <input asp-for="NewEmail" class="form-control rounded-lg border-outline-variant" placeholder="Clinician Email" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-uppercase text-muted">Phone Number</label>
+                            <input asp-for="PhoneNumber" class="form-control rounded-lg border-outline-variant" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-uppercase text-muted">Birth Date</label>
+                            <input asp-for="BirthDate" type="date" class="form-control rounded-lg border-outline-variant" required />
+                        </div>
+
+                        @if (Model.CurrentUser?.Role.Name == SPMD.Models.RoleName.Doctor || Model.CurrentUser?.Role.Name == SPMD.Models.RoleName.Pharmacist)
+                        {
+                            <div class="col-md-12">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Hospital Employee Number</label>
+                                <input asp-for="HospitalEmployeeNumber" class="form-control rounded-lg border-outline-variant" />
+                            </div>
+                        }
+                        @if (Model.CurrentUser?.Role.Name == SPMD.Models.RoleName.Patient)
+                        {
+                            <div class="col-md-12">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Health ID</label>
+                                <input asp-for="HealthId" class="form-control rounded-lg border-outline-variant" />
+                            </div>
+                        }
                     </div>
-                    <p class="small text-muted mb-0">Note: Updating your email may require re-verification for certain clinical protocols.</p>
                 </div>
-                <div class="modal-footer border-0 p-4 pt-0">
+                <div class="modal-footer border-0 p-4 pt-0 mt-3">
                     <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Save Changes</button>
                 </div>

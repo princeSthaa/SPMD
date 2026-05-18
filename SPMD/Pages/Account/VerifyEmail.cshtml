@@ -1,0 +1,77 @@
+@page
+@model SPMD.Pages.Account.VerifyEmailModel
+@{
+    ViewData["Title"] = "Verify Email";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SPMD</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00236f",
+                        "surface": "#faf8ff",
+                        "on-surface": "#1a1b21",
+                        "outline-variant": "#c5c5d3",
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex items-center justify-center p-6 antialiased">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border border-outline-variant/30">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
+                <span class="material-symbols-outlined text-[32px]">mark_email_read</span>
+            </div>
+            <h1 class="text-2xl font-bold mb-2">Verify Your Email</h1>
+            <p class="text-sm text-gray-500">We've sent a 6-digit verification code to <strong>@Model.Email</strong>. Enter it below to activate your account.</p>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="mb-4 p-4 rounded-lg bg-red-50 text-red-700 text-sm flex items-start">
+                <span class="material-symbols-outlined text-[20px] mr-2">error</span>
+                <span>@Model.ErrorMessage</span>
+            </div>
+        }
+
+        <form method="post" class="space-y-6">
+            <input type="hidden" asp-for="Email" />
+            
+            <div>
+                <label asp-for="Code" class="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2 text-center">Verification Code</label>
+                <input asp-for="Code" type="text" maxlength="6" class="w-full text-center text-3xl tracking-[0.5em] py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-mono" placeholder="••••••" required />
+                <span asp-validation-for="Code" class="text-red-600 text-xs mt-1 block text-center"></span>
+            </div>
+
+            <button type="submit" class="w-full flex justify-center items-center gap-2 bg-primary text-white py-3.5 px-4 rounded-xl font-semibold hover:bg-primary/90 focus:outline-none focus:ring-4 focus:ring-primary/30 transition-all shadow-sm">
+                Verify Account
+                <span class="material-symbols-outlined text-[18px]">verified</span>
+            </button>
+        </form>
+
+        <div class="mt-8 pt-6 border-t border-gray-100 text-center">
+            <a asp-page="./Login" class="text-sm font-semibold text-primary hover:underline flex items-center justify-center gap-1">
+                <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+                Back to Login
+            </a>
+        </div>
+    </div>
+</body>
+</html>
